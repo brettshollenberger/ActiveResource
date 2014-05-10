@@ -1,0 +1,27 @@
+{
+  "name": "ActiveResource",
+  "version": "0.7.0",
+  "authors": [
+    "Brett Shollenberger <brett.shollenberger@gmail.com>"
+  ],
+  "license": "MIT",
+  "main": "dist/ng-active-resource.min.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "active-support": "0.0.7",
+    "angular": "latest",
+    "lodash": "latest",
+    "async": "~0.2.5",
+    "meld": "latest"
+  },
+  "devDependencies": {
+    "angular-route": "latest",
+    "angular-mocks": "latest"
+  }
+}

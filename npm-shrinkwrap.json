@@ -1,0 +1,14 @@
+{
+  "name": "ActiveResource",
+  "version": "0.7.0",
+  "dependencies": {
+    "lodash": {
+      "version": "2.4.1",
+      "from": "lodash@latest"
+    },
+    "requirejs": {
+      "version": "2.1.11",
+      "from": "requirejs@~2.1"
+    }
+  }
+}

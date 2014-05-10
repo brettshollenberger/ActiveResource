@@ -1,0 +1,39 @@
+{
+  "name": "ActiveResource",
+  "version": "0.7.0",
+  "description": "RESTful resource modeling",
+  "main": "index.js",
+  "author": "Brett Shollenberger <brett@facultycreative.com>",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "latest"
+  },
+  "devDependencies": {
+    "faculty-api": "0.1.1",
+    "bcryptjs": "latest",
+    "load-grunt-tasks": "latest",
+    "express": "latest",
+    "mongoose": "latest",
+    "grunt": "latest",
+    "grunt-contrib-watch": "latest",
+    "grunt-shell": "latest",
+    "jasmine-node": "latest",
+    "grunt-karma": "latest",
+    "karma-script-launcher": "latest",
+    "karma-chrome-launcher": "latest",
+    "karma-firefox-launcher": "latest",
+    "karma-html2js-preprocessor": "latest",
+    "karma-jasmine": "latest",
+    "karma-requirejs": "latest",
+    "karma-coffee-preprocessor": "latest",
+    "karma-coverage": "latest",
+    "karma-osx-reporter": "*",
+    "karma-phantomjs-launcher": "latest",
+    "karma": "latest",
+    "karma-ng-html2js-preprocessor": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-clean": "latest",
+    "grunt-ngmin": "latest",
+    "grunt-contrib-uglify": "latest"
+  }
+}
