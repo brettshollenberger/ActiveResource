@@ -441,6 +441,12 @@ describe("BCValidatable", function() {
       });
     });
 
+    it("validates separate instances", function() {
+      var person2 = Person.new({});
+      expect(person.$valid).toBe(true);
+      expect(person2.$valid).toBe(false);
+    });
+
     it("requires fields conditionally", function() {
       person.email    = "";
       person.username = "";
