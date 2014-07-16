@@ -8,6 +8,12 @@ describe("BCDefinable", function() {
     expect(post.id).toEqual(1);
   });
 
+  it("adds integer validations", function() {
+    expect(post.$valid).toEqual(true);
+    post.id = "fun";
+    expect(post.$valid).toEqual(false);
+  });
+
   it("adds string attributes", function() {
     expect(post.title).toEqual("What I Want");
   });
@@ -16,8 +22,20 @@ describe("BCDefinable", function() {
     expect(post.commentCount).toEqual(5);
   });
 
+  it("adds number validations", function() {
+    expect(post.$valid).toEqual(true);
+    post.commentCount = "low";
+    expect(post.$valid).toEqual(false);
+  });
+
   it("adds boolean properties", function() {
     expect(post.public).toEqual(true);
+  });
+
+  it("adds boolean validations", function() {
+    expect(post.$valid).toEqual(true);
+    post.public = "maybe";
+    expect(post.$valid).toEqual(false);
   });
 });
 

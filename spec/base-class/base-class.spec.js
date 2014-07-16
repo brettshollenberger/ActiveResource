@@ -8,7 +8,7 @@ describe('BaseClass', function() {
         var _prototype   = _constructor.prototype;
 
         _constructor.new = function(attributes) {
-          _constructor.attributes = attributes;
+          _constructor.constructing = { attributes: attributes };
           var instance = new _constructor(attributes);
           return instance;
         };
