@@ -153,19 +153,9 @@ describe("Mime", function() {
     describe("a new mimetype with backed data format", function() {
       var atomXml, applicationJson;
       beforeEach(function() {
-        new Mime.Format({name: "xml"});
         new Mime.Type({name: "application/atom+xml"});
         new Mime.Format({name: "json"});
         new Mime.Type({name: "application/json"});
-
-        function xmlParser(data) {
-          return {
-            post: {
-              postId: 1,
-              title: "My Great Post"
-            }
-          };
-        };
 
         function atomParser(data) {
           data.post.specialAttr = true;
@@ -181,7 +171,6 @@ describe("Mime", function() {
           return json;
         };
 
-        Mime.formats["xml"].parsers.push(xmlParser);
         Mime.types["application/atom+xml"].parsers.push(atomParser);
 
         Mime.formats["json"].parsers.push(jsonParser);
@@ -198,7 +187,7 @@ describe("Mime", function() {
       it("transforms a mimetype according to its parsers & underlying format", function() {
         expect(Mime.parse(
           {type: "application/atom+xml", data: atomXml}))
-          .toEqual({post: {postId: 1, title: "My Great Post", specialAttr: true}});
+          .toEqual({ post : { postId : '1', title : 'My Great Post', specialAttr : true } });
 
         expect(Mime.parse(
           {type: "application/json", data: applicationJson}))
@@ -207,11 +196,11 @@ describe("Mime", function() {
 
       it("also has syntax for parsing via the MimeType instance", function() {
         expect(Mime.types["application/atom+xml"].parse(atomXml))
-          .toEqual({post: {postId: 1, title: "My Great Post", specialAttr: true}});
+          .toEqual({ post : { postId : '1', title : 'My Great Post', specialAttr : true } });
 
         expect(Mime.types["application/atom+xml"]
           .parse({data: atomXml}))
-            .toEqual({post: {postId: 1, title: "My Great Post", specialAttr: true}});
+            .toEqual({ post : { postId : '1', title : 'My Great Post', specialAttr : true } });
       });
 
       it("throws a ParseError if the parse chain does not return an object", 
