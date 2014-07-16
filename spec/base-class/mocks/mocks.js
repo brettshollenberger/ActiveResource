@@ -1,8 +1,9 @@
 angular
   .module('Mocks', ['BaseClass'])
-  .factory('Mocks', ['Post', 'Person', function(Post, Person) {
+  .factory('Mocks', ['Post', 'Person', 'TShirt', function(Post, Person, TShirt) {
     return {
       Post: Post,
-      Person: Person
+      Person: Person,
+      TShirt: TShirt
     };
   }]);
