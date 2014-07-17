@@ -40,6 +40,24 @@ describe('ARAPI', function() {
       expect(Post.api().get("show", {id: 1})).toEqual("https://api.edmodo.com/posts/1");
     });
 
+    it("replaces any params", function() {
+      Post.api().showURL = "/posts/:title";
+
+      expect(Post.api().get("show", {id: 1, title: "The Abstractions Are Leaking!"}))
+        .toEqual("https://api.edmodo.com/posts/The Abstractions Are Leaking!?id=1");
+    });
+
+    it("checks parameterizePARAM function to parameterize", function() {
+      Post.api().showURL = "/posts/:title";
+
+      Post.api().parameterizeTitle = function(title) {
+        return title.split(" ").join("-").toLowerCase().replace(/[\!\?]/g, '');
+      }
+
+      expect(Post.api().get("show", {title: "The Abstractions Are Leaking!"}))
+        .toEqual("https://api.edmodo.com/posts/the-abstractions-are-leaking");
+    });
+
     it("appends a query string with the rest of the parameters for GET type URLs", function() {
       expect(Post.api().get("show", {id: 1, author_id: 1, public: true})).toEqual(
         "https://api.edmodo.com/posts/1?author_id=1&public=true");
