@@ -4,7 +4,7 @@ describe('ARAPI', function() {
       expect(Post.api().baseURL).toEqual("https://api.edmodo.com");
     });
 
-    it("drops trailing slashses from baseURL if necessary", function() {
+    it("drops trailing slashes from baseURL if necessary", function() {
       Post.api().set("https://api.edmodo.com/");
       expect(Post.api().baseURL).toEqual("https://api.edmodo.com");
     });
@@ -32,6 +32,20 @@ describe('ARAPI', function() {
 
     it("adds a delete URL", function() {
       expect(Post.api().deleteURL).toEqual("/posts/:id");
+    });
+  });
+
+  describe("api#get", function() {
+    it("parameterizes params that exist on instances", function() {
+      expect(Post.api().get("show", {id: 1})).toEqual("https://api.edmodo.com/posts/1");
+    });
+
+    it("appends a query string with the rest of the parameters for GET type URLs", function() {
+      expect(Post.api().get("show", {id: 1, author_id: 1, public: true})).toEqual(
+        "https://api.edmodo.com/posts/1?author_id=1&public=true");
+
+      expect(Post.api().get("index", {author_id: 1, public: true})).toEqual(
+        "https://api.edmodo.com/posts?author_id=1&public=true");
     });
   });
 });
