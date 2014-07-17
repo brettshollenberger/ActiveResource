@@ -24,5 +24,10 @@ describe("Mime.XML", function() {
       expect(Mime.format({type: "xml", data: javascriptObject})).toEqual(
         "<post><postId>1</postId><title>My Great Post</title></post>");
     });
+
+    it("adds toXML method to base class instances", function() {
+      var post = Post.new({id: 1, title: "My Great Post"});
+      expect(post.toXML()).toEqual("<id>1</id><title>My Great Post</title><commentCount/><public/><$errors/>");
+    });
   });
 });
