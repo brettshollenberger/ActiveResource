@@ -44,8 +44,23 @@ describe('ARAPI', function() {
       expect(Post.api().get("show", {id: 1, author_id: 1, public: true})).toEqual(
         "https://api.edmodo.com/posts/1?author_id=1&public=true");
 
-      expect(Post.api().get("index", {author_id: 1, public: true})).toEqual(
-        "https://api.edmodo.com/posts?author_id=1&public=true");
+      expect(Post.api().get("index", {author_id: 1, public: true}))
+        .toEqual("https://api.edmodo.com/posts?author_id=1&public=true");
+    });
+
+    it("only parameterizes params for delete action", function() {
+      expect(Post.api().get("delete", {id: 1, public: true}))
+        .toEqual("https://api.edmodo.com/posts/1");
+    });
+
+    it("only parameterizes params for update action", function() {
+      expect(Post.api().get("update", {id: 1, public: true}))
+        .toEqual("https://api.edmodo.com/posts/1");
+    });
+
+    it("appends no query string for create action", function() {
+      expect(Post.api().get("create", {id: 1, public: true}))
+        .toEqual("https://api.edmodo.com/posts");
     });
   });
 });
