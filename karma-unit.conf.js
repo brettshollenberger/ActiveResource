@@ -22,12 +22,12 @@ module.exports = function(config) {
       'bower_components/active-support/active-support.js',
       'bower_components/lodash/dist/lodash.js',
       'bower_components/async/lib/async.js',
-      'lib/base-class/base-class.js',
-      'lib/base-class/**/*.js',
-      'spec/base-class/mocks/mocks.js',
-      'spec/base-class/mocks/*.js',
-      'spec/base-class/spec-helper.js',
-      'spec/base-class/**/*.js',
+      'lib/ng-active-resource/ng-active-resource.js',
+      'lib/ng-active-resource/**/*.js',
+      'spec/ng-active-resource/mocks/mocks.js',
+      'spec/ng-active-resource/mocks/*.js',
+      'spec/ng-active-resource/spec-helper.js',
+      'spec/ng-active-resource/**/*.js',
     ],
     // list of files / patterns to exclude
     exclude: [],
@@ -58,7 +58,7 @@ module.exports = function(config) {
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
     singleRun: true,
-    
+
     reporters: ['progress', 'osx'],
 
     // provide green / red for apss / fail.
