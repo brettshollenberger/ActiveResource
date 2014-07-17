@@ -1,9 +1,5 @@
 describe("Mime", function() {
   describe("Adding Formats", function() {
-    beforeEach(function() {
-      new Mime.Format({name: "json"});
-    });
-
     it("adds new core formats", function() {
       expect(Mime.formats.json).toBeDefined();
     });
@@ -154,7 +150,6 @@ describe("Mime", function() {
       var atomXml, applicationJson;
       beforeEach(function() {
         new Mime.Type({name: "application/atom+xml"});
-        new Mime.Format({name: "json"});
         new Mime.Type({name: "application/json"});
 
         function atomParser(data) {
@@ -181,7 +176,7 @@ describe("Mime", function() {
                     <title>My Great Post</title> \
                   </post>";
 
-        applicationJson = {post: {postId: 1, title: 'My Great Post'}};
+        applicationJson = JSON.stringify({post: {postId: 1, title: 'My Great Post'}});
       });
 
       it("transforms a mimetype according to its parsers & underlying format", function() {
