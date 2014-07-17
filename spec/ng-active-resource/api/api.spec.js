@@ -1,40 +1,4 @@
 describe('ARAPI', function() {
-  describe("api#set", function() {
-    it("sets the base URL", function() {
-      expect(Post.api().baseURL).toEqual("https://api.edmodo.com");
-    });
-
-    it("drops trailing slashes from baseURL if necessary", function() {
-      Post.api().set("https://api.edmodo.com/");
-      expect(Post.api().baseURL).toEqual("https://api.edmodo.com");
-    });
-
-    it("sets http protocol if necessary", function() {
-      Post.api().set("api.edmodo.com");
-      expect(Post.api().baseURL).toEqual("http://api.edmodo.com");
-    });
-
-    it("adds an index URL", function() {
-      expect(Post.api().indexURL).toEqual("/posts");
-    });
-
-    it("adds a show URL", function() {
-      expect(Post.api().showURL).toEqual("/posts/:id");
-    });
-
-    it("adds a create URL", function() {
-      expect(Post.api().createURL).toEqual("/posts");
-    });
-
-    it("adds an update URL", function() {
-      expect(Post.api().updateURL).toEqual("/posts/:id");
-    });
-
-    it("adds a delete URL", function() {
-      expect(Post.api().deleteURL).toEqual("/posts/:id");
-    });
-  });
-
   describe("api#get", function() {
     it("parameterizes params that exist on instances", function() {
       expect(Post.api().get("show", {id: 1})).toEqual("https://api.edmodo.com/posts/1.json");
@@ -84,6 +48,46 @@ describe('ARAPI', function() {
 
   describe("Format", function() {
     it("appends formats", function() {
+      expect(Post.api().get("index", {})).toEqual("https://api.edmodo.com/posts.json");
+    });
+  });
+
+  describe("Configuration", function() {
+    it("can be configured not to append format", function() {
+      Post.api().configure(function(api) {
+        api.appendFormat = false;
+      });
+
+      expect(Post.api().get("index", {})).toEqual("https://api.edmodo.com/posts");
+    });
+
+    it("can be configured at a global level", function() {
+      API.configure(function(config) {
+        config.baseURL = "https://api.edmodo.com";
+        config.format  = "text/xml";
+      });
+
+      function Member() {}
+      Member.inherits(ngActiveResource.Base);
+
+      Member.api().configure(function(config) {
+        config.resource = "user";
+      });
+
+      expect(Member.api().get("index", {})).toEqual("https://api.edmodo.com/users.xml");
+    });
+
+    it("is overridden by model-specific configuration", function() {
+      API.configure(function(config) {
+        config.baseURL      = "https://api.edmodo.com";
+        config.format       = "text/xml";
+        config.appendFormat = false;
+      });
+
+      function User() {}
+      User.inherits(ngActiveResource.Base);
+
+      expect(User.api().get("index", {})).toEqual("https://api.edmodo.com/users");
       expect(Post.api().get("index", {})).toEqual("https://api.edmodo.com/posts.json");
     });
   });

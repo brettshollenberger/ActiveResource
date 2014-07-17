@@ -10,6 +10,12 @@ angular
     };
 
     Post.inherits(ngActiveResource.Base);
-    Post.api().set("https://api.edmodo.com").format("json");
+
+    Post.api().configure(function(api) {
+      api.baseURL      = "https://api.edmodo.com";
+      api.format       = "json";
+      api.appendFormat = true;
+    });
+
     return Post;
   }]);
