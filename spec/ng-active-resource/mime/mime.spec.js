@@ -8,7 +8,6 @@ describe("Mime", function() {
   describe("Adding MimeTypes", function() {
     describe("Top-Level Name, Tree, Subtype Name, Suffix Format", function() {
       beforeEach(function() {
-        new Mime.Type({name: "application/json"});
         new Mime.Type({name: "application/atom+xml"});
         new Mime.Type({name: "application/vnd.ms-excel"});
       });
@@ -50,10 +49,6 @@ describe("Mime", function() {
   });
 
   describe("finding by mimetype", function() {
-    beforeEach(function() {
-      new Mime.Type({name: "application/json"});
-    });
-
     it("finds registered mimetypes", function() {
       var mimetype = Mime.types.find("application/json");
       expect(mimetype.name).toEqual("application/json");
@@ -66,7 +61,6 @@ describe("Mime", function() {
     };
 
     beforeEach(function() {
-      new Mime.Type({name: "application/json"});
       Mime.types["application/json"].parsers.push(jsonParser);
     });
 
@@ -150,7 +144,6 @@ describe("Mime", function() {
       var atomXml, applicationJson;
       beforeEach(function() {
         new Mime.Type({name: "application/atom+xml"});
-        new Mime.Type({name: "application/json"});
 
         function atomParser(data) {
           data.post.specialAttr = true;
