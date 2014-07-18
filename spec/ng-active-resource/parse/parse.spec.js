@@ -1,43 +1,40 @@
 describe("Parsing", function() {
   describe("Adding model-specific parse methods", function() {
-    it("passes to model-specific parse function after parsing the mimetype", function() {
-      var post;
 
-      function Post() {
-        this.integer("id");
-        this.string("title");
-        this.integer("author_id");
-      }
+    var post, xml, response;
+    beforeEach(function() {
+      response = JSON.stringify({ id: 1, title: "My Great Post", author: { id: 2 } })
+      xml      = "<post>" +
+                    "<id>1</id>" +
+                    "<title>My Great Post</title>" +
+                    "<author>" +
+                      "<id>2</id>" + 
+                    "</author>" +
+                "</post>";
 
-      Post.inherits(ngActiveResource.Base);
+      backend.whenGET("https://api.edmodo.com/posts/1.json")
+        .respond(response);
 
-      Post.parse = function(post) {
-        if (post.author) {
-          post.author_id = post.author.id;
-          delete post.author;
-        }
+      spyOn($http, 'get').andCallThrough();
+    });
 
-        return post;
-      }
+    it("deserializes instances using parse method", function() {
+      expect(Post.deserialize(response).author_id).toEqual(2);
+    });
 
+    it("deserializes arrays of instances using parse method", function() {
       Post.api().configure(function(config) {
-        config.baseURL           = "https://api.edmodo.com";
         config.format            = "xml";
         config.unwrapRootElement = true;
       });
 
-      backend.whenGET("https://api.edmodo.com/posts/1.xml")
-        .respond("<post><id>1</id><title>My Great Post</title><author><id>2</id></author></post>");
+      expect(Post.deserialize(xml).author_id).toEqual(2);
+    });
 
-      spyOn($http, 'get').andCallThrough();
-
-      Post.find(1).then(function(response) { 
-        post = response; 
-      });
-
+    it("passes to model-specific parse function after parsing the mimetype", function() {
+      Post.find(1).then(function(response) { post = response; });
       backend.flush();
-
-      expect(post.author_id).toEqual('2');
+      expect(post.author_id).toEqual(2);
     });
   });
 });

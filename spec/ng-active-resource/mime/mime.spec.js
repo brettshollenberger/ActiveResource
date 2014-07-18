@@ -175,7 +175,7 @@ describe("Mime", function() {
       it("transforms a mimetype according to its parsers & underlying format", function() {
         expect(Mime.parse(
           {type: "application/atom+xml", data: atomXml}))
-          .toEqual({ post : { postId : '1', title : 'My Great Post', specialAttr : true } });
+          .toEqual({ post : { postId : 1, title : 'My Great Post', specialAttr : true } });
 
         expect(Mime.parse(
           {type: "application/json", data: applicationJson}))
@@ -184,11 +184,7 @@ describe("Mime", function() {
 
       it("also has syntax for parsing via the MimeType instance", function() {
         expect(Mime.types["application/atom+xml"].parse(atomXml))
-          .toEqual({ post : { postId : '1', title : 'My Great Post', specialAttr : true } });
-
-        expect(Mime.types["application/atom+xml"]
-          .parse({data: atomXml}))
-            .toEqual({ post : { postId : '1', title : 'My Great Post', specialAttr : true } });
+          .toEqual({ post : { postId : 1, title : 'My Great Post', specialAttr : true } });
       });
 
       it("throws a ParseError if the parse chain does not return an object", 
