@@ -17,5 +17,7 @@ angular
       this.passwordConfirmation = attributes.passwordConfirmation;
     }
 
+    Person.hasMany("hats", {provider: "ARHat"});
+
     return Person;
   }]);

@@ -12,6 +12,8 @@ angular
       this.boolean("public");
     };
 
+    Post.hasMany("comments");
+
     Post.api.configure(function(config) {
       config.baseURL      = "https://api.edmodo.com";
       config.format       = "json";
