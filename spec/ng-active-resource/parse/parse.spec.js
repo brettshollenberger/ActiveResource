@@ -23,6 +23,26 @@ describe("Parsing", function() {
     });
 
     it("deserializes arrays of instances using parse method", function() {
+      var posts = JSON.stringify([
+        {
+          id: 1,
+          title: "My Great Post",
+          author: {
+            id: 2
+          }
+        },
+        {
+          id: 3,
+          title: "My Greater Post",
+          author: {
+            id: 4
+          }
+        }
+      ]);
+      expect(Post.deserialize(posts)[0].author_id).toEqual(2);
+    });
+
+    it("deserializes xml", function() {
       Post.api().configure(function(config) {
         config.format            = "xml";
         config.unwrapRootElement = true;
