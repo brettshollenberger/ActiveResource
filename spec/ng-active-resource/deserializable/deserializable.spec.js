@@ -38,7 +38,7 @@ describe("Deserializable", function() {
     });
 
     it("deserializes xml", function() {
-      Post.api().configure(function(config) {
+      Post.api.configure(function(config) {
         config.format            = "xml";
         config.unwrapRootElement = true;
       });

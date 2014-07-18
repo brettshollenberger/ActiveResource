@@ -12,7 +12,7 @@ angular
       this.boolean("public");
     };
 
-    Post.api().configure(function(config) {
+    Post.api.configure(function(config) {
       config.baseURL      = "https://api.edmodo.com";
       config.format       = "json";
       config.appendFormat = true;
