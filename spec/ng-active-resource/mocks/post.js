@@ -27,5 +27,14 @@ angular
       return post;
     }
 
+    Post.format = function(post) {
+      if (post.author_id) {
+        post.author = {id: post.author_id}
+        delete post.author_id;
+      }
+
+      return post;
+    }
+
     return Post;
   }]);
