@@ -33,7 +33,7 @@ describe("Serializable", function() {
         '[{"id":1,"title":"My Great Post","author":{"id":2}},{"id":3,"title":"My Greater Post","author":{"id":4}}]');
     });
 
-    it("deserializes xml", function() {
+    it("serializes xml", function() {
       Post.api().configure(function(config) {
         config.format            = "xml";
         config.unwrapRootElement = true;
