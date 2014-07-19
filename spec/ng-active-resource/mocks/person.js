@@ -15,8 +15,9 @@ angular
       this.size                 = attributes.size;
       this.password             = attributes.password;
       this.passwordConfirmation = attributes.passwordConfirmation;
-      this.hasMany("hats", {provider: "ARHat"});
     }
+
+    Person.hasMany("hats", {provider: "ARHat"});
 
     return Person;
   }]);

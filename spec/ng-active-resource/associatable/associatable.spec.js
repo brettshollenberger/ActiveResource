@@ -1,11 +1,5 @@
 describe('ARAssociatable', function() {
   describe("class#hasMany", function() {
-    var post, person;
-    beforeEach(function() {
-      post   = Post.new({});
-      person = Person.new({});
-    });
-
     it("adds hasMany association to class", function() {
       expect(_.keys(Post.associations.hasMany)).toContain("comments");
     });
@@ -20,12 +14,6 @@ describe('ARAssociatable', function() {
   });
 
   describe("class#belongsTo", function() {
-    var comment, hat;
-    beforeEach(function() {
-      comment = Comment.new({});
-      hat     = Hat.new({});
-    });
-
     it("adds belongsTo association to class", function() {
       expect(_.keys(Comment.associations.belongsTo)).toContain("post");
     });

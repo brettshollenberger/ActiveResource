@@ -10,8 +10,9 @@ angular
       this.integer("author_id");
       this.number("commentCount");
       this.boolean("public");
-      this.hasMany("comments");
     };
+
+    Post.hasMany("comments");
 
     Post.api.configure(function(config) {
       config.baseURL      = "https://api.edmodo.com";

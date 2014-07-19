@@ -8,8 +8,9 @@ angular
       this.integer("id");
       this.string("body");
       this.integer("post_id");
-      this.belongsTo("post");
     };
+
+    Comment.belongsTo("post");
 
     return Comment;
   }]);

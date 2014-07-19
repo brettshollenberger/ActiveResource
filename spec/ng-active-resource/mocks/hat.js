@@ -5,9 +5,10 @@ angular
     Hat.inherits(ngActiveResource.Base);
 
     function Hat() {
-      this.belongsTo("person", {foreignKey: "user_id"});
-      this.belongsTo("collection", {provider: "ARCollection"});
     }
+
+    Hat.belongsTo("person", {foreignKey: "user_id"});
+    Hat.belongsTo("collection", {provider: "ARCollection"});
 
     return Hat;
 
