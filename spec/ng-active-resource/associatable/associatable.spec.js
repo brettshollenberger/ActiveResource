@@ -12,7 +12,7 @@ describe('ARAssociatable', function() {
       expect(Person.associations.hats.klass).toEqual(Hat);
     });
 
-    describe("Creating associations", function() {
+    describe("Creating instances", function() {
       var post;
       beforeEach(function() {
          post = Post.new({});
@@ -31,6 +31,7 @@ describe('ARAssociatable', function() {
         var comment = post.comments.new({});
         expect(comment.post).toEqual(post);
       });
+
     });
   });
 
@@ -49,6 +50,23 @@ describe('ARAssociatable', function() {
 
     it("overrides foreign key if provided", function() {
       expect(Hat.associations.person.foreignKey).toContain("user_id");
+    });
+
+    describe("Creating instances", function() {
+      var post, comment;
+      beforeEach(function() {
+         post    = Post.new({});
+         comment = Comment.new({post: post});
+      });
+
+      it("creates belongsTo association", function() {
+        expect(comment.post).toEqual(post);
+      });
+
+      it("creates no association by default", function() {
+        comment = Comment.new({});
+        expect(comment.post).toBeUndefined();
+      });
     });
   });
 });
