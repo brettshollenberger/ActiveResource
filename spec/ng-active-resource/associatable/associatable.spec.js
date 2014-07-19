@@ -15,7 +15,7 @@ describe('ARAssociatable', function() {
     describe("Creating instances", function() {
       var post;
       beforeEach(function() {
-         post = Post.new({});
+         post = Post.new();
       });
 
       it("creates empty hasMany association", function() {
@@ -54,11 +54,18 @@ describe('ARAssociatable', function() {
     describe("Creating instances", function() {
       var post, comment;
       beforeEach(function() {
-         post    = Post.new({});
+         post    = Post.new();
          comment = Comment.new({post: post});
       });
 
       it("creates belongsTo association", function() {
+        expect(comment.post).toEqual(post);
+      });
+
+      it("updates belongsTo association when known", function() {
+        comment = Comment.new();
+        comment.update({post: post});
+
         expect(comment.post).toEqual(post);
       });
 
