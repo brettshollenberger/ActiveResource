@@ -31,7 +31,6 @@ describe('ARAssociatable', function() {
         var comment = post.comments.new({});
         expect(comment.post).toEqual(post);
       });
-
     });
   });
 
