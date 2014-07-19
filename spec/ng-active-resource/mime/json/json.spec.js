@@ -7,16 +7,16 @@ describe("Mime.JSON", function() {
     });
 
     it("parses json", function() {
-      expect(Mime.parse({type: "json", data: json})).toEqual({id: 1, title: "My Great Post"});
+      expect(Mime.parse({type: "json", data: json})).toEqual({id: 1, title: "My Great Post", comments: []});
     });
 
     it("formats json", function() {
       expect(Mime.format({type: "json", data: post})).toEqual(
-        '{"id":1,"title":"My Great Post"}');
+        '{"id":1,"title":"My Great Post","comments":[]}');
     });
 
     it("adds toJSON method to base class instances", function() {
-      expect(post.toJson()).toEqual('{"id":1,"title":"My Great Post"}');
+      expect(post.toJson()).toEqual('{"id":1,"title":"My Great Post","comments":[]}');
     });
   });
 });
