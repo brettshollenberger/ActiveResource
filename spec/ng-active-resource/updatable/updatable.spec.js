@@ -6,4 +6,13 @@ describe("ARUpdatable", function() {
     expect(post.id).toEqual(1);
     expect(post.title).toEqual("My Great Post");
   });
+
+  it("sets associations with foreign keys", function() {
+    var post    = Post.new({id: 1});
+    var comment = Comment.new();
+
+    comment.update({post_id: 1});
+
+    expect(comment.post).toEqual(post);
+  });
 });
