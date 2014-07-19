@@ -10,6 +10,13 @@ describe("ARFindable", function() {
     expect(foundPost).toEqual(post);
   });
 
+  it("finds using a hash of attributes", function() {
+    var post      = Post.new({id: 1});
+    var foundPost = Post.find({id: 1});
+
+    expect(foundPost).toEqual(post);
+  });
+
   it("queries the backend for instances otherwise", function() {
     var post = Post.find(1);
     backend.flush();
