@@ -5,7 +5,7 @@ angular
     Post.inherits(ngActiveResource.Base);
 
     function Post(attributes) {
-      this.integer("id");
+      // this.integer("id");
       this.string("title");
       this.integer("author_id");
       this.number("commentCount");

@@ -12,11 +12,11 @@ describe("Mime.JSON", function() {
 
     it("formats json", function() {
       expect(Mime.format({type: "json", data: post})).toEqual(
-        '{"id":1,"title":"My Great Post","comments":[]}');
+        '{"title":"My Great Post","id":1,"comments":[]}');
     });
 
     it("adds toJSON method to base class instances", function() {
-      expect(post.toJson()).toEqual('{"id":1,"title":"My Great Post","comments":[]}');
+      expect(post.toJson()).toEqual('{"title":"My Great Post","id":1,"comments":[]}');
     });
   });
 });
