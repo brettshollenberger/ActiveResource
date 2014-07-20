@@ -108,6 +108,28 @@ describe("ARSaveable", function() {
     });
   });
 
+  describe("Automatic associations", function() {
+    var post, comment;
+    beforeEach(function() {
+      backend.whenPOST("https://api.edmodo.com/comments.json").respond(200, {
+        id: 1,
+        body: "good comment",
+        post_id: 1
+      });
+
+      spyOn($http, "post").andCallThrough();
+
+      post    = Post.new({id: 1});
+      comment = Comment.$create({body: "good comment"});
+
+      backend.flush();
+    });
+
+    it("automatically associates the has many relationship", function() {
+      expect(comment.post).toEqual(post);
+    });
+  });
+
   describe("Save Config", function() {
     var post;
     beforeEach(function() {

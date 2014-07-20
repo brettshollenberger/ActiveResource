@@ -17,4 +17,8 @@ beforeEach(inject(function(_ngActiveResource_, _Mocks_, _ARMime_, _ARAPI_, $http
     $http            = _$http_;
     $timeout         = _$timeout_;
     QueryCache       = _ARQueryCache_;
+
+    API.configure(function(config) {
+      config.baseURL = "https://api.edmodo.com";
+    });
 }));
