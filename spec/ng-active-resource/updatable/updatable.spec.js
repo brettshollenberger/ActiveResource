@@ -15,4 +15,38 @@ describe("ARUpdatable", function() {
 
     expect(comment.post).toEqual(post);
   });
+
+  describe("Updating on the server", function() {
+    var post;
+    beforeEach(function() {
+      backend.whenPUT("https://api.edmodo.com/posts/1.json").respond({
+        id: 1,
+        title: "Your Great Title",
+        content: "Wow, what a great post"
+      });
+
+      spyOn($http, "put").andCallThrough();
+
+      post = Post.new();
+      post.content = "Wow, what a great post";
+      post.$update({id: 1, title: "My Great Title"});
+
+      backend.flush();
+    });
+
+    it("calls the updateURL if the instance has a primary key", function() {
+      expect($http.put).toHaveBeenCalledWith("https://api.edmodo.com/posts/1.json",
+        { 
+          headers: {
+            'Content-Type' : 'application/json', 
+            'Accept' : 'application/json' 
+          }
+        }
+      );
+    });
+
+    it("updates the instance with results from the API", function() {
+      expect(post.title).toEqual("Your Great Title");
+    });
+  });
 });
