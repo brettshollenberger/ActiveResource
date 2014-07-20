@@ -125,8 +125,9 @@ describe("ARSaveable", function() {
       backend.flush();
     });
 
-    it("automatically associates the has many relationship", function() {
+    it("automatically associates the relationships", function() {
       expect(comment.post).toEqual(post);
+      expect(post.comments).toContain(comment);
     });
   });
 
