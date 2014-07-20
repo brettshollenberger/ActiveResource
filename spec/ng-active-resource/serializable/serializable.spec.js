@@ -16,6 +16,21 @@ describe("Serializable", function() {
         .toEqual('{"id":1,"title":"My Great Post","author":{"id":2}}');
     });
 
+    it("serializes instances", function() {
+      post = Post.new({id: 1, title: "My Great Post", author_id: 2});
+
+      expect(post.serialize())
+        .toEqual('{"title":"My Great Post","id":1,"comments":[],"author":{"id":2}}');
+    });
+
+    it("translates associations to foreign keys", function() {
+      post    = Post.new({id: 1});
+      comment = post.comments.new();
+
+      expect(comment.serialize())
+        .toEqual('{"post_id":1}');
+    });
+
     it("serializes arrays of instances using format method", function() {
       var posts = [
         {
