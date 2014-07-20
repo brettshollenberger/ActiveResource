@@ -470,6 +470,11 @@ describe("ARValidatable", function() {
       expect(person.$valid).toBe(false);
     });
 
+    it("validates length only if required", function() {
+      person.name = "";
+      expect(person.$valid).toBe(true);
+    });
+
     it("validates length in", function() {
       person.username = "a very long username";
       expect(person.$valid).toBe(false);
@@ -483,6 +488,13 @@ describe("ARValidatable", function() {
       expect(person.$errors.email).toContain("is not a valid email.");
     });
 
+    it("validates email only if required", function() {
+      person.email = "";
+      expect(person.$valid).toBe(true);
+      person.email = undefined;
+      expect(person.$valid).toBe(true);
+    });
+
     it("validates zip format", function() {
       expect(person.$valid).toBe(true);
       person.zip = "not an zip";
@@ -490,11 +502,21 @@ describe("ARValidatable", function() {
       expect(person.$errors.zip).toContain("is not a valid zip code.");
     });
 
+    it("validates zip only if required", function() {
+      person.zip = "";
+      expect(person.$valid).toBe(true);
+    });
+
     it("validates arbitrary formats", function() {
       expect(person.$valid).toBe(true);
       person.uuid = "not an uuid";
       expect(person.$valid).toBe(false);
       expect(person.$errors.uuid).toContain("is not a valid uuid.");
+    });
+
+    it("validates formats only if required", function() {
+      person.uuid = "";
+      expect(person.$valid).toBe(true);
     });
 
     it("validates numericality", function() {
