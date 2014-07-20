@@ -31,6 +31,17 @@ describe('ARAssociatable', function() {
         var comment = post.comments.new({});
         expect(comment.post).toEqual(post);
       });
+
+      it("adds new instances on create", function() {
+        var comment  = Comment.new();
+        var comment2 = Comment.new();
+        var post     = Post.new({comments: [comment, comment2]});
+
+        expect(post.comments).toContain(comment);
+        expect(post.comments).toContain(comment2);
+        expect(comment.post).toEqual(post);
+        expect(comment2.post).toEqual(post);
+      });
     });
   });
 
