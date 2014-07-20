@@ -157,7 +157,7 @@ describe("ARSaveable", function() {
       post.content = "Wow, what a great post";
       post.$save({title: "My Great Title"});
 
-      Post.data("save", function(instance, response) {
+      Post.data("save", function(response) {
         response.data = response.data.data;
       });
 
