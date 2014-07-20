@@ -209,7 +209,7 @@ describe("ARSaveable", function() {
 
       $timeout.flush();
 
-      expect(errors.title[0]).toEqual("cannot be blank.");
+      expect(errors).toEqual(post.$errors);
     });
   });
 });
