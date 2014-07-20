@@ -194,5 +194,22 @@ describe("ARSaveable", function() {
       expect(status).toEqual(500);
       expect(error).toEqual({error: "Backend overloaded"});
     });
+
+    it("rejects invalid instances without saving", function() {
+      var errors;
+
+      Post.validates({
+        title: { required: true }
+      });
+
+      post.title = undefined;
+      post.$save().catch(function(err) {
+        errors = err;
+      });
+
+      $timeout.flush();
+
+      expect(errors.title[0]).toEqual("cannot be blank.");
+    });
   });
 });
