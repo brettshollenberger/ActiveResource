@@ -12,7 +12,7 @@ describe("ARFindable", function() {
 
   it("finds using a hash of attributes", function() {
     var post      = Post.new({id: 1});
-    var foundPost = Post.find({id: 1});
+    var foundPost = Post.find({id: 1})
 
     expect(foundPost).toEqual(post);
   });
@@ -22,5 +22,13 @@ describe("ARFindable", function() {
     backend.flush();
     expect(post.title).toEqual("My Great Post");
     expect(Post.cached[1]).toEqual(post);
+  });
+
+  it("takes a promise and returns the instance", function() {
+    var post = Post.find(1).then(function(response) {});
+
+    backend.flush();
+
+    expect(post.id).toEqual(1);
   });
 });
