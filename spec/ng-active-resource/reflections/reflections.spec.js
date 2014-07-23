@@ -6,6 +6,14 @@ describe("ARReflection", function() {
     Farm.include(Reflections);
   });
 
-  iit("creates reflections", function() {
+  it("creates hasMany reflections", function() {
+    Farm.hasMany("pigs", {});
+    expect(Farm.reflections.pigs.constructor.name).toEqual("HasManyReflection");
   });
+
+  it("creates belongsTo reflections", function() {
+    Farm.belongsTo("farmer", {});
+    expect(Farm.reflections.farmer.constructor.name).toEqual("BelongsToReflection");
+  });
+
 });
