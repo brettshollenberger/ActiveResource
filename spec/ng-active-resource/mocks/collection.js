@@ -2,10 +2,12 @@ angular
   .module('Mocks')
   .factory('ARCollection', ['ngActiveResource', function(ngActiveResource) {
 
-    Collection.inherits(ngActiveResource.Base);
+    ARCollection.inherits(ngActiveResource.Base);
 
-    function Collection(attributes) {
+    function ARCollection(attributes) {
     };
 
-    return Collection;
+    ARCollection.hasMany("hats", {provider: "ARHat"});
+
+    return ARCollection;
   }]);

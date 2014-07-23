@@ -18,6 +18,14 @@ ddescribe("ARReflection", function() {
 
       expect(Post.reflections.comments.associationPrimaryKey()).toEqual("_id");
     });
+
+    it("returns the inverse association", function() {
+      expect(Post.reflections.comments.inverse()).toEqual(Comment.reflections.post);
+    });
+
+    it("finds the inverse association by another name", function() {
+      expect(Collection.reflections.hats.inverse()).toEqual(Hat.reflections.collection);
+    });
   });
 
   describe("BelongsToReflections", function() {
@@ -37,6 +45,10 @@ ddescribe("ARReflection", function() {
       Post.primaryKey = "p_id";
 
       expect(Comment.reflections.post.associationPrimaryKey()).toEqual("p_id");
+    });
+
+    it("returns the inverse association", function() {
+      expect(Comment.reflections.post.inverse()).toEqual(Post.reflections.comments);
     });
   });
 });
