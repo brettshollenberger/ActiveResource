@@ -45,5 +45,16 @@ describe('Delegatable', function() {
     expect(account.street()).toEqual(client.street());
     expect(client.street()).toEqual(address.street());
   });
+
+  it("delegates to arbitrary objects", function() {
+    var a = {};
+    var b = {c: function() { return this; }}
+    a.b   = b;
+
+    a.extend(Delegatable);
+    a.delegate("c").to(b);
+
+    expect(a.c()).toEqual(b);
+  });
 });
 
