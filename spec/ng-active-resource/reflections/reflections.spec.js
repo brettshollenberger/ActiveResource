@@ -1,5 +1,4 @@
 ddescribe("ARReflection", function() {
-
   describe("HasManyReflections", function() {
     it("creates hasMany reflections", function() {
       expect(Post.reflections.comments.constructor.name).toEqual("HasManyReflection");
@@ -19,12 +18,17 @@ ddescribe("ARReflection", function() {
       expect(Post.reflections.comments.associationPrimaryKey()).toEqual("_id");
     });
 
-    it("returns the inverse association", function() {
+    it("returns the inverse reflection", function() {
       expect(Post.reflections.comments.inverse()).toEqual(Comment.reflections.post);
     });
 
-    it("finds the inverse association by another name", function() {
+    it("finds the inverse reflection when its name is not typical", function() {
       expect(Collection.reflections.hats.inverse()).toEqual(Hat.reflections.collection);
+    });
+
+    it("maintains the name of the macro used to build the reflection", function() {
+      expect(Post.reflections.comments.macro).toEqual("hasMany");
+      expect(Collection.reflections.hats.macro).toEqual("hasMany");
     });
   });
 
@@ -47,8 +51,12 @@ ddescribe("ARReflection", function() {
       expect(Comment.reflections.post.associationPrimaryKey()).toEqual("p_id");
     });
 
-    it("returns the inverse association", function() {
+    it("returns the inverse reflection", function() {
       expect(Comment.reflections.post.inverse()).toEqual(Post.reflections.comments);
+    });
+
+    it("maintains the name of the macro used to build the reflection", function() {
+      expect(Comment.reflections.post.macro).toEqual("belongsTo");
     });
   });
 });
