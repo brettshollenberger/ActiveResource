@@ -26,4 +26,20 @@ ddescribe("ARAssociatable", function() {
       expect(post.comments).toContain(comment);
     });
   });
+
+  describe("BelongsTo", function() {
+    it("initializes belongsTo association", function() {
+      post    = Post.new({id: 1});
+      comment = Comment.new({id: 1, post: post});
+
+      expect(comment.post).toBe(post);
+    });
+
+    it("initializes belongsTo via foreign key", function() {
+      post    = Post.new({id: 1});
+      comment = Comment.new({id: 1, post_id: post.id});
+
+      expect(comment.post).toBe(post);
+    });
+  });
 });
