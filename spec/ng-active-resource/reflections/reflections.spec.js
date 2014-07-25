@@ -35,6 +35,15 @@ ddescribe("ARReflection", function() {
       expect(Post.reflections.comments.isHasMany()).toEqual(true);
       expect(Post.reflections.comments.isBelongsTo()).toEqual(false);
     });
+
+    it("reflects on all associations of a given macro type", function() {
+      expect(Post.reflectOnAllAssociations()).toEqual(Post.reflections);
+      expect(Post.reflectOnAllAssociations("hasMany")).toEqual(Post.reflections.where(function(r) {
+        return r.macro == "hasMany";
+      }).toObject(function(rs, r) {
+        rs[r.name] = r;
+      }));
+    });
   });
 
   describe("BelongsToReflections", function() {
