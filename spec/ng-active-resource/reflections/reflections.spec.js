@@ -1,4 +1,4 @@
-ddescribe("ARReflection", function() {
+describe("ARReflection", function() {
   describe("HasManyReflections", function() {
     it("creates hasMany reflections", function() {
       expect(Post.reflections.comments.constructor.name).toEqual("HasManyReflection");
@@ -43,6 +43,18 @@ ddescribe("ARReflection", function() {
       }).toObject(function(rs, r) {
         rs[r.name] = r;
       }));
+    });
+
+    it("describes whether or not an association is instantiated", function() {
+      expect(Post.reflections.comments.containsAssociation({}, {})).toEqual(false);
+    });
+
+    it("initializes the association", function() {
+      var post    = Post.new({id: 1});
+      var comment = Comment.new({id: 1});
+      Post.reflections.comments.initialize(post, {comments: comment});
+
+      expect(post.comments).toContain(comment);
     });
   });
 
