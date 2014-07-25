@@ -30,6 +30,11 @@ ddescribe("ARReflection", function() {
       expect(Post.reflections.comments.macro).toEqual("hasMany");
       expect(Collection.reflections.hats.macro).toEqual("hasMany");
     });
+
+    it("contains helper methods to determine the macro assertively", function() {
+      expect(Post.reflections.comments.isHasMany()).toEqual(true);
+      expect(Post.reflections.comments.isBelongsTo()).toEqual(false);
+    });
   });
 
   describe("BelongsToReflections", function() {
@@ -57,6 +62,11 @@ ddescribe("ARReflection", function() {
 
     it("maintains the name of the macro used to build the reflection", function() {
       expect(Comment.reflections.post.macro).toEqual("belongsTo");
+    });
+
+    it("contains helper methods to determine the macro assertively", function() {
+      expect(Comment.reflections.post.isHasMany()).toEqual(false);
+      expect(Comment.reflections.post.isBelongsTo()).toEqual(true);
     });
   });
 });
