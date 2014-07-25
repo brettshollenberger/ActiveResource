@@ -1,6 +1,6 @@
 var comment, comment2, post;
 
-ddescribe("ARAssociatable", function() {
+describe("ARAssociatable", function() {
   describe("HasMany", function() {
     it("initializes hasMany associations", function() {
       comment = Comment.new({id: 1});
@@ -25,6 +25,13 @@ ddescribe("ARAssociatable", function() {
 
       expect(post.comments).toContain(comment);
     });
+
+    it("initializes both sides of the association", function() {
+      comment = Comment.new({id: 1});
+      post    = Post.new({id: 1, comments: comment});
+
+      expect(post.comments.first().post).toBe(post);
+    });
   });
 
   describe("BelongsTo", function() {
@@ -40,6 +47,13 @@ ddescribe("ARAssociatable", function() {
       comment = Comment.new({id: 1, post_id: post.id});
 
       expect(comment.post).toBe(post);
+    });
+
+    it("initializes both sides of the association", function() {
+      post    = Post.new({id: 1});
+      comment = Comment.new({id: 1, post_id: post.id});
+
+      expect(comment.post.comments).toContain(comment);
     });
   });
 });
