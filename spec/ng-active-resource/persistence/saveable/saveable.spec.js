@@ -205,9 +205,9 @@ describe("ARSaveable", function() {
       post.content = "Wow, what a great post";
       post.$save({title: "My Great Title"});
 
-      Post.fail("save", function(err, stat, fn) {
-        error  = err;
-        status = stat;
+      Post.fail("save", function(deferred, response, params) {
+        error  = response.error;
+        status = response.status;
       });
 
       backend.flush();
@@ -215,7 +215,7 @@ describe("ARSaveable", function() {
 
     it("triggers fail callbacks", function() {
       expect(status).toEqual(500);
-      expect(error).toEqual({error: "Backend overloaded"});
+      expect(error).toEqual("Backend overloaded");
     });
 
     it("rejects invalid instances without saving", function() {
