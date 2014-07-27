@@ -1,6 +1,10 @@
 describe("ARFindable", function() {
   beforeEach(function() {
     backend.whenGET("https://api.edmodo.com/posts/1.json").respond({id: 1, title: "My Great Post"});
+
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1")
+      .respond([{id: 1, title: "My Great Post", author_id: 1},
+                {id: 2, title: "Joan of Shark", author_id: 1}], {}, 200);
   });
 
   it("finds cached instances if they exist already in the system", function() {
@@ -30,5 +34,13 @@ describe("ARFindable", function() {
     backend.flush();
 
     expect(post.id).toEqual(1);
+  });
+
+  it("finds multiple instances", function() {
+    var posts = Post.where({author_id: 1});
+
+    backend.flush();
+
+    expect(posts.first().id).toEqual(1);
   });
 });
