@@ -12,6 +12,15 @@ describe("ARQueryable", function() {
     expect(posts.first().id).toEqual(1);
   });
 
+  it("returns queries from the cache if they've already been performed", function() {
+    var posts  = Post.where({author_id: 1});
+    backend.flush();
+
+    var posts2 = Post.where({author_id: 1});
+
+    expect(posts.first()).toEqual(posts2.first());
+  });
+
   it("transforms the json into model instances", function() {
     var posts = Post.where({author_id: 1});
     backend.flush();
