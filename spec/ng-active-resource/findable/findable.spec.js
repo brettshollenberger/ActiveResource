@@ -38,9 +38,22 @@ describe("ARFindable", function() {
 
   it("finds multiple instances", function() {
     var posts = Post.where({author_id: 1});
-
     backend.flush();
 
     expect(posts.first().id).toEqual(1);
+  });
+
+  it("transforms the json into model instances", function() {
+    var posts = Post.where({author_id: 1});
+    backend.flush();
+
+    expect(posts.first().constructor).toEqual(Post);
+  });
+
+  it("saves the response to the query", function() {
+    var posts = Post.where({author_id: 1});
+    backend.flush();
+
+    expect(Post.queryCache.find({author_id:1})).toEqual(posts);
   });
 });

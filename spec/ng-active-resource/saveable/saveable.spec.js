@@ -96,8 +96,8 @@ describe("ARSaveable", function() {
       expect($http.post).toHaveBeenCalledWith("https://api.edmodo.com/posts.xml",
         { 
           headers: {
-            'Content-Type' : 'text/xml', 
-            'Accept' : 'text/xml' 
+            'Content-Type' : 'text/xml',
+            'Accept' : 'text/xml'
           }
         }
      );
