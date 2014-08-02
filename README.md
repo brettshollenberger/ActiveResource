@@ -229,7 +229,7 @@ know that `$http` methods take a signature like this:
   $http.put(url, data, [config])
 ```
 
-ngActiveResouce model methods are just wrappers around these methods, and your
+ngActiveResource model methods are just wrappers around these methods, and your
 API can define options you use all the time to keep you from having to pass in
 options every time you make a request.
 
