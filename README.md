@@ -8,7 +8,7 @@ pattern persistence methods.
 
 In your bower.json:
 
-    "ngActiveResource": "0.6.3"
+    "ngActiveResource": "x.x.x"
 
 ## Simple:
 
@@ -28,28 +28,27 @@ Say you want a form to add comments to a post:
 In your controller, all you have to setup is something like this:
 
 ```javascript
-Post.find(postId).then(function(response) {
-    $scope.post      = response;
-    $scope.comment   = $scope.post.comments.new();
+$scope.post    = Post.find(1);
+$scope.comment = $scope.post.comments.new();
 
-    Comment.after('$save', function() {
-        $scope.comment = $scope.post.comments.new();
-    });
-};
+Comment.after('$save', function() {
+    $scope.comment = $scope.post.comments.new();
+});
 ```
 
 You don't even have to tell `ng-repeat` to load in the new comment. The new
-comment will already be added to the post by association. Simply tell the
-`comment` object on the scope to clear, so that the user can enter another
-comment.
+comment will already be added to the post by association.
 
 ## Writing a Model:
 
-Create an Angular factory or provider that relies on ActiveResource:
+Create an Angular factory or provider that relies on ngActiveResource:
 
 ```javascript
-angular.module('app', ['ActiveResource'])
-    .factory('Post', ['ActiveResource', function(ActiveResource) {
+angular
+    .module('app', ['ngActiveResource'])
+    .factory('Post', ['ngActiveResource', function(ngActiveResource) {
+
+        Post.inherits(ngActiveResource.Base);
 
         function Post(data) {
             this.number('id');
@@ -64,15 +63,11 @@ angular.module('app', ['ActiveResource'])
             this.belongsTo('author');
         };
 
-        Post.inherits(ActiveResource.Base);
-        Post.api.set('http://api.faculty.com');
-        Post.dependentDestroy('comments');
-
-        return User;
+        return Post;
   });
 ```
 
-The model is terse, but gains a lot of functionality from ActiveResource.Base.
+The model is terse, but gains a lot of functionality from ngActiveResource.Base.
 
 It declares a has-many relationship on Comment, allowing it to say things like:
 
@@ -90,28 +85,199 @@ things like:
 ```javascript
 var author     = Author.new();
 comment.author = author;
-comment.$save().then(function(response) { comment = response; });
+comment.$save();
 ```
 
 This will also cause author.comments to include this instance of Comment.
 
-Post also declares a dependent-destroy relationship on comments, meaning:
+## Declaring Your API
+
+### Global Declaration
+
+ngActiveResource has to know about your API in order to interact with it. Let's
+say you're working with just one API. In your app config, you can bootstrap the
+API globally:
 
 ```javascript
-Post.$delete().then(function(response) { post = comment = response; });
+  angular
+    .module('App', ['ngActiveResource'])
+    .config(function(ngActiveResource) {
 
-expect(post).not.toBeDefined();
-expect(comment).not.toBeDefined();
-expect(Post.find({ title: "My First Post" }).not.toBeDefined();
-expect(Comment.find({ text: "Great post!" }).not.toBeDefined();
+      ngActiveResource.api.configure(function(config) {
+        // what's the root of your API?
+        config.baseURL = "https://api.edmodo.com/v1";
+
+        // use something generic
+        config.format  = "json";
+
+        // or something more specific
+        config.format = "application/vnd.amundsen.maze+xml";
+
+        // don't append .format e.g. api.edmodo.com/v1/users.json
+        config.appendFormat = false;
+      });
+
+    });
 ```
 
-This means the post and its comments have been deleted both locally and from the
-database.
+### Model-Specific Declaration
 
-The astute reader will notice methods prefaced with `$` are interacting with an
-API. The API calls are established in the model definition under
-`Post.api.set()`.
+Maybe you've got a more complicated situation. A service-oriented
+architecture with different APIs for your different endpoints. All
+application-wide defaults can be overridden on a model-specific basis:
+
+```javascript
+angular
+    .module('app', [])
+    .factory('Post', ['ngActiveResource', function(ngActiveResource) {
+
+      Post.inherits(ngActiveResource.Base);
+
+      Post.api.configure(function(config) {
+        config.baseURL  = "https://posty.api.edmodo.com";
+        config.format   = "xml";
+
+        // URLs will be:
+        // GET    https://posty.api.edmodo.com/posts.xml
+        // GET    https://posty.api.edmodo.com/posts/1.xml
+        // POST   https://posty.api.edmodo.com/posts.xml
+        // PUT    https://posty.api.edmodo.com/posts/1.xml
+        // DELETE https://posty.api.edmodo.com/posts/1.xml
+        config.resource = "posts";
+      });
+
+      function Post() {}
+
+      return Post;
+
+    }]);
+```
+
+### Endpoint-Specific Declaration
+
+The most idiomatic way to name your endpoints is through the `resource` config
+method shown above. With it, you gain a predicatable, RESTful API structure.
+
+| HTTP Verb | CRUD       | Path         | Action   | Method         | Used To                 |
+| --------- | :--------: | :----------: | :------: | :------------: | :---------------------  |
+| GET       | Retrieve   | /users       | index    | where          | Display a list of users |
+| GET       | Retrieve   | /users/:id   | show     | find           | Display a specific user |
+| POST      | Create     | /users       | create   | $create, $save | Create a user           |
+| PUT       | Update     | /users/:id   | update   | $update, $save | Update a specific user  |
+| DELETE    | Destroy    | /users/:id   | destroy  | $destroy       | Delete a specific user  |
+
+_A word of caution_: You should use the `resource` config method if you need no
+more specific configuration. Technically, ngActiveResource doesn't require you
+to define any `resource` name at all--it will intuit the resource name from the
+name of your model. _BUT_: while this will work in development-mode, if you
+uglify your Javascript in production, most uglifiers will remove function names,
+which will cause ngActiveResource to lose its ability to intuit resource URLs in
+production. _Defining the name of the resource in the config block will save you_.
+
+If you need more specific configuration than the `resource` method (let's be
+honest, we all do from time to time), you can override specific URLs. The names
+of these URLs are derived from the name of the _action_:
+
+```javascript
+  Post.api.configure(function(config) {
+    config.indexURL  = "show-me-all-the-posts";
+    config.createURL = "create-a-post";
+    config.showURL   = "posts/:title";
+    config.updateURL = "posts/:title";
+    config.deleteURL = "posts/:title";
+  });
+```
+
+In the example above, we defined a URL structure that probably needs to be able
+to "mung" a title. To define your title-munger, define a config method named
+`parameterizeTitle`:
+
+```javascript
+  Post.api.configure(function(config) {
+    // "My Great Title" => "my-great-title"
+    config.parameterizeTitle = function(title) {
+      return title.split(" ").join("-").toLowerCase().replace(/[\!\?]/g, '');
+    }
+  });
+```
+
+This method should be named `parameterize#{pascal-cased-parameter-name}`. For
+example:
+
+```javascript
+  config.showURL = "posts/:wonkyPostId";
+
+  config.parameterizeWonkyPostId = function() {
+  }
+
+  config.showURL = "posts/:strange_post_id";
+
+  config.parameterizeStrangePostId = function() {
+  }
+```
+
+### HTTP Configuration
+
+You'll probably also find yourself wanting to configure various `$http` options.
+If you've been working with Angular for a little while, you probably already
+know that `$http` methods take a signature like this:
+
+```javascript
+  $http.get(url, [config])
+  $http.delete(url, [config])
+  $http.post(url, data, [config])
+  $http.put(url, data, [config])
+```
+
+ngActiveResouce model methods are just wrappers around these methods, and your
+API can define options you use all the time to keep you from having to pass in
+options every time you make a request.
+
+_Everything_ that you can configure in an Angular `$http` request can be
+configured via ngActiveResource's `http` config:
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.cache   = true;
+  config.headers = {
+    "Accept": "application/json"
+  },
+  config.transformRequest = function() { ... }
+
+  ... etc ...
+});
+```
+
+As an example, let's say you have an authentication service. After your user is
+authenticated, all of their requests should include their request token attached
+to the query string, so that they can authenticate additional requests:
+
+```javascript
+angular
+  .module('app')
+  .factory('authentication', ['ngActiveResource', function(ngActiveResource) {
+
+    function performAuthentication() { ... }
+
+    function authenticate() {
+      performAuthentication.then(configureAPI);
+    }
+
+    function configureAPI(response) {
+      ngActiveResource.api.configure(function(config) {
+
+        // all $http configuration goes on the $http object
+        config.$http.params = {
+          api_token = response.api_token
+        }
+
+      });
+    };
+
+    return authenticate;
+
+  }]);
+```
 
 ## Computed Properties:
 
@@ -137,10 +303,10 @@ function TShirt() {
 A has many association can be setup by naming the field. If the field name is
 also the name of the provider that contains the foreign model, this is all you
 have to say. If the name of the provider is different, you can set it explicitly
-via the `provider` option: 
+via the `provider` option:
 
 ```javascript
-this.hasMany('comments', { provider: 'CommentModel' });
+this.hasMany('comments', { provider: 'MyApp.CommentModel' });
 ```
 
 Foreign keys will also be intuited. For instance:
