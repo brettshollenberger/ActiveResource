@@ -1,12 +1,21 @@
 describe("ARDeletable", function() {
   describe("Deleting instances", function() {
-    var post;
+    var posts, posts2, post;
     beforeEach(function() {
+      backend.whenGET("https://api.edmodo.com/posts.json?author_id=1").respond(200, [
+        {id: 1, title: "My Great Post", author_id: 1},
+        {id: 2, title: "My Greater Post", author_id: 1}
+      ]);
+
       backend.whenDELETE("https://api.edmodo.com/posts/1.json").respond(200, {});
 
       spyOn($http, "delete").andCallThrough();
 
-      post         = Post.new({id: 1});
+      posts  = Post.where({author_id: 1});
+      posts2 = Post.where({author_id: 1});
+      backend.flush();
+
+      post  = posts.first();
       post.$delete({title: "My Great Title"});
 
       backend.flush();
@@ -18,6 +27,12 @@ describe("ARDeletable", function() {
 
     it("removes all properties from the deleted object", function() {
       expect(post.id).toBeUndefined();
+      expect(post.title).toBeUndefined();
+    });
+
+    it("removes instances from all watched collections", function() {
+      expect(Post.watchedCollections.first()).not.toContain(post);
+      expect(Post.watchedCollections.last()).not.toContain(post);
     });
   });
 });
