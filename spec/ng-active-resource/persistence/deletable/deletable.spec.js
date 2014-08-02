@@ -15,5 +15,9 @@ describe("ARDeletable", function() {
     it("calls the deleteURL", function() {
       expect($http.delete.mostRecentCall.args[0]).toEqual("https://api.edmodo.com/posts/1.json");
     });
+
+    it("removes all properties from the deleted object", function() {
+      expect(post.id).toBeUndefined();
+    });
   });
 });
