@@ -21,6 +21,32 @@ describe("ARSaveable", function() {
       expect($http.post.mostRecentCall.args[0]).toEqual("https://api.edmodo.com/posts.json");
     });
 
+    it("serializes data", function() {
+      expect($http.post.mostRecentCall.args[2].data).toEqual(
+        '{"title":"My Great Title","comments":[],"content":"Wow, what a great post"}'
+      );
+    });
+
+    it("serializes to the format of the API", function() {
+      Post.api.configure(function(config) {
+        config.format = "xml";
+      });
+
+      backend.whenPUT("https://api.edmodo.com/posts/1.xml").respond(200, {
+        id: 1,
+        title: "My Great Title",
+        content: "Wow, what a great post"
+      });
+
+      spyOn($http, "put").andCallThrough();
+      post.$save();
+      backend.flush();
+
+      expect($http.put.mostRecentCall.args[2].data).toEqual(
+        '<title>My Great Title</title><author_id/><commentCount/><public/><id>1</id><comments/><content>Wow, what a great post</content>'
+      );
+    });
+
     it("updates the instance with results from the API", function() {
       expect(post.id).toEqual(1);
     });
