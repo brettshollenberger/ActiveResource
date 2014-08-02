@@ -19,6 +19,7 @@ describe("ARCreatable", function() {
 
     expect(post.id).toEqual(1);
     expect($http.post).toHaveBeenCalledWith('https://api.edmodo.com/posts.json', { 
+      data: {},
       headers : { 
         'Content-Type' : 'application/json', 
         'Accept' : 'application/json' 

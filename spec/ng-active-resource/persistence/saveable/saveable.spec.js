@@ -20,6 +20,7 @@ describe("ARSaveable", function() {
     it("calls the createURL if the instance has no primary key", function() {
       expect($http.post).toHaveBeenCalledWith("https://api.edmodo.com/posts.json", 
         { 
+          data: {},
           headers: {
             'Content-Type' : 'application/json', 
             'Accept' : 'application/json' 
@@ -54,6 +55,7 @@ describe("ARSaveable", function() {
     it("calls the updateURL if the instance has a primary key", function() {
       expect($http.put).toHaveBeenCalledWith("https://api.edmodo.com/posts/1.json",
         { 
+          data: {},
           headers: {
             'Content-Type' : 'application/json', 
             'Accept' : 'application/json' 
@@ -94,7 +96,8 @@ describe("ARSaveable", function() {
 
     it("calls the xml endpoint", function() {
       expect($http.post).toHaveBeenCalledWith("https://api.edmodo.com/posts.xml",
-        { 
+        {
+          data: {},
           headers: {
             'Content-Type' : 'text/xml',
             'Accept' : 'text/xml'
@@ -155,6 +158,7 @@ describe("ARSaveable", function() {
 
     it("calls the createURL if the instance has no primary key", function() {
       expect($http.post).toHaveBeenCalledWith('https://api.edmodo.com/posts.json', { 
+        data: {},
         headers : { 
           'Content-Type' : 'text/xml',
           'Accept' : 'application/json' 
