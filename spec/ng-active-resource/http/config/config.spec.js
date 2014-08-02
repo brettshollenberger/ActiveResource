@@ -1,6 +1,6 @@
 describe("ARHTTPConfig", function() {
   beforeEach(function() {
-    Post.api.configure(function(config) {
+    API.configure(function(config) {
       config.data = {
         api_token: "1234"
       }
@@ -26,5 +26,19 @@ describe("ARHTTPConfig", function() {
     backend.flush();
 
     expect($http.get.mostRecentCall.args[1].data).toEqual({published: true, api_token: "1234"});
+  });
+
+  it("overrides defaults on individual APIs", function() {
+    Post.api.configure(function(config) {
+      config.data = {
+        api_token: "5678"
+      }
+    });
+
+    var post = Post.find(1);
+
+    backend.flush();
+
+    expect($http.get.mostRecentCall.args[1].data).toEqual({api_token: "5678"});
   });
 });
