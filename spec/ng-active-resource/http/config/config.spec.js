@@ -9,7 +9,11 @@ describe("ARHTTPConfig", function() {
     backend.whenGET("https://api.edmodo.com/posts/1.json")
       .respond(200, {id: 1, title: "My Great Post", author_id: 1}, {});
 
+    backend.whenPOST("https://api.edmodo.com/posts.json")
+      .respond(200, {id: 1, title: "My Great Post", author_id: 1}, {});
+
     spyOn($http, "get").andCallThrough();
+    spyOn($http, "post").andCallThrough();
   });
 
   it("adds default data to requests", function() {
@@ -40,5 +44,13 @@ describe("ARHTTPConfig", function() {
     backend.flush();
 
     expect($http.get.mostRecentCall.args[1].data).toEqual({api_token: "5678"});
+  });
+
+  xit("uses data on all actions", function() {
+    var post = Post.$create({title: "My Great Title"});
+
+    backend.flush();
+
+    expect($http.post.mostRecentCall.object()).toEqual({api_token: "1234"});
   });
 });

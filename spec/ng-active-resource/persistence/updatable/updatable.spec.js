@@ -35,15 +35,7 @@ describe("ARUpdatable", function() {
     });
 
     it("calls the updateURL if the instance has a primary key", function() {
-      expect($http.put).toHaveBeenCalledWith("https://api.edmodo.com/posts/1.json",
-        {
-          data: {},
-          headers: {
-            'Content-Type' : 'application/json', 
-            'Accept' : 'application/json' 
-          }
-        }
-      );
+      expect($http.put.mostRecentCall.args[0]).toEqual("https://api.edmodo.com/posts/1.json");
     });
 
     it("updates the instance with results from the API", function() {
