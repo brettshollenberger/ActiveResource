@@ -12,6 +12,13 @@ describe("ARQueryable", function() {
     expect(posts.first().id).toEqual(1);
   });
 
+  it("watches collections queried for", function() {
+    var posts = Post.where({author_id: 1});
+    backend.flush();
+
+    expect(Post.watchedCollections).toContain(posts);
+  });
+
   it("returns queries from the cache if they've already been performed", function() {
     var posts  = Post.where({author_id: 1});
     backend.flush();
