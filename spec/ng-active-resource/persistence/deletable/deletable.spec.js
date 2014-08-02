@@ -16,7 +16,7 @@ describe("ARDeletable", function() {
       backend.flush();
 
       post  = posts.first();
-      post.$delete({title: "My Great Title"});
+      post.$delete();
 
       backend.flush();
     });
@@ -33,6 +33,25 @@ describe("ARDeletable", function() {
     it("removes instances from all watched collections", function() {
       expect(Post.watchedCollections.first()).not.toContain(post);
       expect(Post.watchedCollections.last()).not.toContain(post);
+    });
+  });
+
+  describe("Deleting associated instances", function() {
+
+    var post, comment;
+    beforeEach(function() {
+      backend.whenDELETE("https://api.edmodo.com/comments/1.json").respond(200, {});
+
+      post    = Post.new({id: 1});
+      comment = post.comments.new({id: 1});
+
+      comment.$delete();
+
+      backend.flush();
+    });
+
+    it("removes the instance from all associations", function() {
+      expect(post.comments).not.toContain(comment);
     });
   });
 });
