@@ -1,7 +1,7 @@
 describe("ARHTTPConfig", function() {
   beforeEach(function() {
     API.configure(function(config) {
-      config.params = {
+      config.$http.params = {
         api_token: "1234"
       }
     });
@@ -40,7 +40,7 @@ describe("ARHTTPConfig", function() {
 
   it("overrides defaults on individual APIs", function() {
     Post.api.configure(function(config) {
-      config.params = {
+      config.$http.params = {
         api_token: "5678"
       }
     });
@@ -52,11 +52,33 @@ describe("ARHTTPConfig", function() {
     expect($http.get.mostRecentCall.args[1].params).toEqual({api_token: "5678"});
   });
 
-  it("uses params on all actions", function() {
+  it("uses params on save action", function() {
     var post = Post.$create({title: "My Great Title"});
 
     backend.flush();
 
     expect($http.post.mostRecentCall.args[2].params).toEqual({api_token: "1234"});
+  });
+
+  it("uses params on where action", function() {
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&api_token=1234")
+      .respond(200, [{id: 1, title: "My Great Post", author_id: 1}], {});
+
+    var posts = Post.where({author_id: 1});
+
+    backend.flush();
+
+    expect($http.get.mostRecentCall.args[1].params).toEqual({api_token: "1234"});
+  });
+
+  it("adds arbitrary attributes to the $http configuration", function() {
+    Post.api.configure(function(config) {
+      config.$http.cache = true;
+    });
+
+    post = Post.find(1);
+    backend.flush();
+
+    expect($http.get.mostRecentCall.args[1].cache).toBe(true);
   });
 });
