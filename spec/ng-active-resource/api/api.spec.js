@@ -5,7 +5,9 @@ describe('ARAPI', function() {
     });
 
     it("replaces any params", function() {
-      Post.api.showURL = "/posts/:title";
+      Post.api.configure(function(config) {
+        config.showURL = "/posts/:title";
+      });
 
       expect(Post.api.get("show", {id: 1, title: "The Abstractions Are Leaking!"}))
         .toEqual("https://api.edmodo.com/posts/The Abstractions Are Leaking!.json?id=1");
@@ -78,8 +80,8 @@ describe('ARAPI', function() {
     });
 
     it("is overridden by model-specific configuration", function() {
-      API.configure(function(config) {
-        config.baseURL      = "https://api.edmodo.com";
+      ngActiveResource.API.configure(function(config) {
+        config.baseURL      = "https://api.edmodo.com/v1";
         config.format       = "text/xml";
         config.appendFormat = false;
       });
@@ -87,7 +89,7 @@ describe('ARAPI', function() {
       function User() {}
       User.inherits(ngActiveResource.Base);
 
-      expect(User.api.get("index", {})).toEqual("https://api.edmodo.com/users");
+      expect(User.api.get("index", {})).toEqual("https://api.edmodo.com/v1/users");
       expect(Post.api.get("index", {})).toEqual("https://api.edmodo.com/posts.json");
     });
   });
