@@ -1,6 +1,6 @@
 describe("ARDeletable", function() {
   describe("Deleting instances", function() {
-    var posts, posts2, post;
+    var posts, posts2, post, post2;
     beforeEach(function() {
       backend.whenGET("https://api.edmodo.com/posts.json?author_id=1").respond(200, [
         {id: 1, title: "My Great Post", author_id: 1},
@@ -16,6 +16,7 @@ describe("ARDeletable", function() {
       backend.flush();
 
       post  = posts.first();
+      post2 = posts.last();
       post.$delete();
 
       backend.flush();
@@ -33,6 +34,12 @@ describe("ARDeletable", function() {
     it("removes instances from all watched collections", function() {
       expect(Post.watchedCollections.first()).not.toContain(post);
       expect(Post.watchedCollections.last()).not.toContain(post);
+      expect(Post.watchedCollections.first()).toContain(post2);
+    });
+
+    it("removes instances from cached queries", function() {
+      expect(Post.queryCache.find({author_id: 1})).not.toContain(post);
+      expect(Post.queryCache.find({author_id: 1})).toContain(post2);
     });
   });
 
