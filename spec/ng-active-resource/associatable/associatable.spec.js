@@ -66,15 +66,6 @@ describe("ARAssociatable", function() {
         expect(post.comments.first().id).toEqual(2);
         expect(post.comments.last().id).toEqual(3);
       });
-
-      it("queries locally", function() {
-        post     = Post.new({id: 1});
-        comment  = post.comments.new({id: 2});
-        comments = post.comments.where({id: 2}, {remote: false});
-
-        expect(comments.length).toEqual(1);
-        expect(comments.first().post).toEqual(post);
-      });
     });
 
     describe("#findAll", function() {
