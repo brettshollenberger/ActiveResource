@@ -26,15 +26,14 @@ describe("ARDeletable", function() {
       expect($http.delete.mostRecentCall.args[0]).toEqual("https://api.edmodo.com/posts/1.json");
     });
 
-    it("removes all properties from the deleted object", function() {
-      expect(post.id).toBeUndefined();
-      expect(post.title).toBeUndefined();
-    });
-
     it("removes instances from all watched collections", function() {
       expect(Post.watchedCollections.first()).not.toContain(post);
       expect(Post.watchedCollections.last()).not.toContain(post);
       expect(Post.watchedCollections.first()).toContain(post2);
+    });
+
+    it("is removed from the identity map style cache", function() {
+      expect(Post.findCached(post)).toBeUndefined();
     });
 
     it("removes instances from cached queries", function() {
