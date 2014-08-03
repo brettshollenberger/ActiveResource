@@ -5,6 +5,9 @@ describe("ARFindable", function() {
 
     backend.whenGET("https://api.edmodo.com/posts/1.xml")
       .respond(200, "<post><id>1</id><title>My Great Post</title></post>");
+
+    backend.whenGET("https://api.edmodo.com/comments/1.json")
+      .respond({id: 1, post_id: 1});
   });
 
   it("finds cached instances if they exist already in the system", function() {
@@ -48,5 +51,15 @@ describe("ARFindable", function() {
     backend.flush();
 
     expect(post.id).toEqual(1);
+  });
+
+  it("grabs associations", function() {
+    var post    = Post.new({id: 1});
+    var comment = Comment.find(1);
+
+    backend.flush();
+
+    expect(comment.post).toEqual(post);
+    expect(post.comments).toContain(comment);
   });
 });
