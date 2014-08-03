@@ -1,4 +1,3 @@
-
 describe('Delegatable', function() {
 
   var account, client, address;

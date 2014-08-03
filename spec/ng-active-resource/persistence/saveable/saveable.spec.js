@@ -23,7 +23,7 @@ describe("ARSaveable", function() {
 
     it("serializes data", function() {
       expect($http.post.mostRecentCall.args[2].data).toEqual(
-        '{"title":"My Great Title","comments":[],"content":"Wow, what a great post"}'
+        '{"title":"My Great Title","content":"Wow, what a great post"}'
       );
     });
 
@@ -43,7 +43,7 @@ describe("ARSaveable", function() {
       backend.flush();
 
       expect($http.put.mostRecentCall.args[2].data).toEqual(
-        '<title>My Great Title</title><author_id/><commentCount/><public/><id>1</id><comments/><content>Wow, what a great post</content>'
+        '<title>My Great Title</title><author_id/><commentCount/><public/><id>1</id><content>Wow, what a great post</content>'
       );
     });
 
