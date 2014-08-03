@@ -20,4 +20,20 @@ describe("ARCreatable", function() {
     expect(post.id).toEqual(1);
     expect($http.post.mostRecentCall.args[0]).toEqual('https://api.edmodo.com/posts.json');
   });
+
+  it("grabs associations", function() {
+    backend.whenPOST("https://api.edmodo.com/comments.json").respond(200, {
+      id: 1,
+      body: "Wow, what a great post!",
+      post_id: 1
+    });
+
+    var post    = Post.new({id: 1});
+    var comment = Comment.$create({body: "My Great Title", post_id: 1});
+
+    backend.flush();
+
+    expect(comment.post).toEqual(post);
+    expect(post.comments).toContain(comment);
+  });
 });
