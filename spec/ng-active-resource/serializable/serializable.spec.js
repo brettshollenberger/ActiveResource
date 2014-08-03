@@ -23,6 +23,16 @@ describe("Serializable", function() {
         .toEqual('{"title":"My Great Post","id":1,"comments":[],"author":{"id":2}}');
     });
 
+    it("allows serialization of empty string", function() {
+      post = Post.new({id: 1, title: ""});
+      expect(post.serialize()).toEqual('{"title":"","id":1,"comments":[]}');
+    });
+
+    it("allows serialization of nulls", function() {
+      post = Post.new({id: 1, title: null});
+      expect(post.serialize()).toEqual('{"title":null,"id":1,"comments":[]}');
+    });
+
     it("translates associations to foreign keys", function() {
       post    = Post.new({id: 1});
       comment = post.comments.new();
