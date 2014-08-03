@@ -76,6 +76,24 @@ describe("ARAssociatable", function() {
         expect(comments.first().post).toEqual(post);
       });
     });
+
+    describe("#findAll", function() {
+      it("is like #where with no arguments", function() {
+        backend.whenGET("https://api.edmodo.com/comments.json?post_id=1")
+               .respond(200, [{id: 2, body: "Great post!", post_id: 1},
+                              {id: 3, body: "Awesome!", post_id: 1}]);
+
+        post     = Post.new({id: 1});
+        comments = post.comments.findAll();
+
+        backend.flush();
+
+        expect(comments.first().post).toEqual(post);
+        expect(comments.last().post).toEqual(post);
+        expect(post.comments.first().id).toEqual(2);
+        expect(post.comments.last().id).toEqual(3);
+      });
+    });
   });
 
   describe("BelongsTo", function() {
