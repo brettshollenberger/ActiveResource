@@ -50,4 +50,15 @@ describe("ARQueryable", function() {
 
     expect(Post.queryCache.find({author_id:1})).toEqual(posts);
   });
+
+  it("grabs associations", function() {
+    var author = Author.new({id: 1, name: "Jane Austen"});
+    var posts  = Post.where({author_id: 1});
+
+    backend.flush();
+
+    posts.each(function(post) {
+      expect(post.author).toEqual(author);
+    });
+  });
 });
