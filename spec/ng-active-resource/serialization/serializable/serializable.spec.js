@@ -41,6 +41,14 @@ describe("Serializable", function() {
         .toEqual('{"post_id":1}');
     });
 
+    it("translates associations to non-normative foreign keys", function() {
+      person = Person.new({id: 1});
+      hat    = person.hats.new();
+
+      expect(hat.serialize())
+        .toEqual('{"user_id":1}');
+    });
+
     it("serializes arrays of instances using format method", function() {
       var posts = [
         {

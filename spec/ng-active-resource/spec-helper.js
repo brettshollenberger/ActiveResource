@@ -1,4 +1,4 @@
-var ngActiveResource, Mocks, Post, Comment, Person, Hat, Collection, TShirt, API, backend, $http, $timeout, QueryCache, Delegatable, mixin, Reflections;
+var ngActiveResource, Mocks, Post, Author, Comment, Person, Hat, Collection, TShirt, API, backend, $http, $timeout, QueryCache, Delegatable, mixin, Reflections;
 
 beforeEach(module('ngActiveResource'));
 beforeEach(module('Mocks'));
@@ -7,6 +7,7 @@ beforeEach(inject(function(_ngActiveResource_, _Mocks_, _ARMime_, _ARAPI_, $http
     ngActiveResource = _ngActiveResource_;
     Mocks            = _Mocks_;
     Post             = Mocks.Post;
+    Author           = Mocks.Author;
     Comment          = Mocks.Comment;
     Person           = Mocks.Person;
     Hat              = Mocks.Hat;

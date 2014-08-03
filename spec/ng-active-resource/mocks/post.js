@@ -12,6 +12,7 @@ angular
     };
 
     Post.hasMany("comments");
+    Post.belongsTo("author");
 
     Post.api.configure(function(config) {
       config.baseURL      = "https://api.edmodo.com";
