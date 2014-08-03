@@ -19,18 +19,35 @@ describe("ARAssociatable", function() {
       expect(post.comments).toContain(comment2);
     });
 
-    it("has methods to add associated instances", function() {
-      post    = Post.new({id: 1});
-      comment = post.comments.new({id: 2});
+    describe("#new", function() {
+      it("creates associated instances via `new` method", function() {
+        post    = Post.new({id: 1});
+        comment = post.comments.new({id: 2});
 
-      expect(post.comments).toContain(comment);
+        expect(post.comments).toContain(comment);
+      });
+
+      it("initializes both sides of the association", function() {
+        comment = Comment.new({id: 1});
+        post    = Post.new({id: 1, comments: comment});
+
+        expect(post.comments.first().post).toBe(post);
+      });
     });
 
-    it("initializes both sides of the association", function() {
-      comment = Comment.new({id: 1});
-      post    = Post.new({id: 1, comments: comment});
+    describe("#$create", function() {
+      it("creates and saves associated instances via `$create` method", function() {
+        backend.whenPOST("https://api.edmodo.com/comments.json")
+               .respond(200, {id: 2, body: "Great post!", post_id: 1});
 
-      expect(post.comments.first().post).toBe(post);
+        post    = Post.new({id: 1});
+        comment = post.comments.$create({body: "Great post!"});
+
+        backend.flush();
+
+        expect(comment.post).toEqual(post);
+        expect(post.comments).toContain(comment);
+      });
     });
   });
 
