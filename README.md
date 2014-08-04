@@ -49,18 +49,28 @@ angular
     .factory('Post', ['ngActiveResource', function(ngActiveResource) {
 
         Post.inherits(ngActiveResource.Base);
+                
+        Post.hasMany('comments');
+        Post.belongsTo('author');
+        
+        Post.api.configure(function(config) {
+            config.baseURL  = "http://api.edmodo.com";
+            config.resource = "posts";
+        });
+        
+        Post.validates({
+            title: { required: true },
+            body:  { required: true }
+        });
 
         function Post(data) {
-            this.number('id');
             this.string('title');
             this.string('subtitle');
+            this.string('body');
 
             this.computedProperty('fullTitle', function() {
                 return this.title + this.subtitle;
             }, ['title', 'subtitle']);
-
-            this.hasMany('comments');
-            this.belongsTo('author');
         };
 
         return Post;
