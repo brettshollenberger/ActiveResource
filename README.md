@@ -577,6 +577,66 @@ instance itself. To save the serialized data as a variable, assign it:
 var json = post.serialize();
 ```
 
+## Dirty:
+
+Has an instance changed since last save? Useful for conditionally displaying a
+save button:
+
+```html
+<button ng-show="comment.dirty()">Save</button>
+```
+
+An instance is dirty if any attribute has changed since last save. By default,
+associations are ignored:
+
+```javascript
+comment = Comment.new();
+comment.dirty();
+>> false
+
+comment.update({body: "Great post!"});
+comment.dirty();
+>> true
+
+comment.save();
+comment.dirty();
+>> false
+
+post    = Post.find(1);
+comment = post.comments.new();
+comment.dirty();
+>> false
+
+comment.dirty({ignoreAssociations: false});
+>> true // post_id has changed to 1 and the comment has not been saved
+```
+
+## Changed Attributes:
+
+Get a list of attributes that have changed since last save:
+
+```javascript
+comment = Comment.new();
+comment.changedAttributes();
+>> []
+
+comment.update({body: "Great post!"});
+comment.changedAttributes();
+>> ["body"]
+
+comment.save();
+comment.changedAttributes();
+>> []
+
+post    = Post.find(1);
+comment = post.comments.new();
+comment.changedAttributes();
+>> []
+
+comment.changedAttributes({ignoreAssociations: false});
+>> ["post_id"]
+```
+
 ## Write Validations:
 
 Models can describe validations required before data will be persisted

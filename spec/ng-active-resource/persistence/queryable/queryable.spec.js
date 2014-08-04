@@ -3,6 +3,10 @@ describe("ARQueryable", function() {
     backend.whenGET("https://api.edmodo.com/posts.json?author_id=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
+
+    backend.whenGET("https://api.edmodo.com/posts.json")
+      .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
+                {id: 2, title: "Joan of Shark", author_id: 1}], {});
   });
 
   it("finds multiple instances via query", function() {
@@ -17,6 +21,13 @@ describe("ARQueryable", function() {
     backend.flush();
 
     expect(Post.watchedCollections).toContain(posts);
+  });
+
+  it("uses findAll as an alias for where with no options", function() {
+    var posts = Post.findAll();
+    backend.flush();
+
+    expect(posts.length).toEqual(2);
   });
 
   it("returns queries from the cache if they've already been performed", function() {
