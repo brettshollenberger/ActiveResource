@@ -3089,6 +3089,17 @@ angular.module('ngActiveResource').factory('ARValidatable', [
         _.each(toValidate, _.curry(validateField)(instance));
         return instance.$errors.countFor(fieldName) === 0;
       });
+      privateVariable(_validations, 'validateIfErrored', function (instance, fieldName) {
+        var toValidate = getFieldsToValidate(fieldName);
+        toValidate = _.select(toValidate, function (field) {
+          return instance.$errors[field.field];
+        });
+        if (_.isEmpty(toValidate)) {
+          return;
+        }
+        _.each(toValidate, _.curry(validateField)(instance));
+        return instance.$errors.countFor(fieldName) === 0;
+      });
       function validateField(instance, validation) {
         if (validation.validate(instance) === false) {
           instance.$errors.add(validation.field, validation.message);
@@ -3113,6 +3124,9 @@ angular.module('ngActiveResource').factory('ARValidatable', [
       this.validates = _validations.add;
       this.__validate = function (fieldName) {
         return this.constructor.validations.validate(this, fieldName);
+      };
+      this.__validateIfErrored = function (fieldName) {
+        return this.constructor.validations.validateIfErrored(this, fieldName);
       };
       Object.defineProperty(this, '__$valid', {
         get: function () {
