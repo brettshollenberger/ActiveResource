@@ -441,91 +441,60 @@ search using a querystring:
 Post.api.set('http://faculty.api.com').format('json');
 Post.where({author_id: 1});
 
-// 'http://faculty.api.com/posts.json/?author_id=1'
+// 'http://faculty.api.com/posts.json?author_id=1'
 ```
 
 ### Find:
 
 ```javascript
-Post.find({ title: 'My Great Post' });
+var post = Post.find(1);
 ```
 
 `find` is used to retrieve a single instance of a model. It is a method akin to
-the `show` action in a RESTful API. Therefore, it first attempts to use the `showURL`, and
-will fall back on the `indexURL` if a `showURL` is not defined.
+the `show` action in a RESTful API.
 
-`find` returns only the first instance it finds. If the instance is already
-stored into the browser's cache, it will not make a backend request. To force a
-backend request, you can add the `forceGET` request option:
+Like all ngActiveResource methods, it's also promise-based, so you can do whatever you like after you've found the
+initial resource:
 
 ```javascript
-Post.find({ title: 'My Great Post' }, { forceGET: true });
+var post = Post.find(1).then(function() {
+    post.comments.findAll();
+});
 ```
 
-By default, find will also eagerly load a single level of associations. If a
-Post has many comments, and we find a post, then its comments will be loaded as well,
-but the comments will not load their authors, or other comment-based
-associations. To load associations' associations, pass the option:
+This will load all of the comments onto `post.comments`, so you can write your HTML like:
+
+```html
+<div ng-repeat="comment in post.comments">
+...
+</div>
+```
+
+Even the `post` is promise-based, so if you prefer, you could write the above like:
 
 ```javascript
-{ overEager: true }
+var post = Post.find(1);
+
+post.then(function() { post.comments.findAll(); });
 ```
-
-_Warning:_ Over-eager loading is potentially very resource-intensive, and will often pull
-down sizeable portions of the database.
-
-To lazily load associations (not load even the first level of associations, aka
-comments in the example above), pass the option:
-
-```javascript
-{ lazy: true }
-```
-
-Let's say you're working with a sort of crummy API. It doesn't have an endpoint
-to find a single instance of a particular model, or it won't parse a variety of
-options (like `title` for our post). Maybe it only parses by `id`, and you
-_must_ find the post by title. In that case, hit your index API (the endpoint
-that returns all instances of a given resource), and pass the option:
-
-```javascript
-{ noInstanceEndpoint: true }
-```
-
-This option will do the parsing on the client-side for you to overcome the
-gnarly API.
 
 ### Where:
 
-Similar to the `find` method, but it will pull all instances matching the given
-parameters. Where will _always_ query the backend, assuming that it does not
-have the necessary instances.
-
-`where` is akin to the `index` action in a RESTful API, and therefore first
-attempts to use the `indexURL`, and will fall back on the `showURL` if an
-`indexURL` is not defined.
+Returns an array of instances matching a query.
 
 ```javascript
-Post.where({ author_id: author.id })
+posts = Post.where({ author_id: author.id }).then(function() {
+    posts.each(function(post) { post.comments.findAll(); });
+});
 ```
 
-### All:
+### findAll:
 
-Returns all instances. Takes no parameters:
-
-```javascript
-Post.all()
-```
-
-`all` is just a shorthand for a `where` request with no search parameters
-specified. It therefore will use the `whereURL`, if defined.
-
-### Promise-based:
-
-All queries are promise-based:
+Returns all instances.
 
 ```javascript
-Post.where({ author_id: author.id }).then(function(response) {
-    post = response;
+var posts = Post.findAll().then(function() {
+    posts.each(function(post) { post.comments.findAll(); });
 });
 ```
 
@@ -549,42 +518,80 @@ Post.dependentDestroy('comments');
 ```
 Now when you destroy a post, any associated comments will also be destroyed.
 
-## Serialize/toJSON
+## Serialization
 
-The `serialize` and `toJSON` methods (aliases of one another) change associations to foreign keys and remove circular references.
+### Serialize
+
+The `serialize` method of instances will serialize to the format of your API.
 
 ```javascript
-Post.serialize()
+Post.api.configure(function(config) {
+    config.format = "json";
+});
+
+post = Post.new({title: "My Great Post"});
+
+post.serialize();
+>> '{"title": "My Great Post"}'
+
+Post.api.configure(function(config) {
+    config.format = "xml";
+});
+
+post.serialize();
+>> '<post><title>My Great Post</title></post>'
 ```
 
-These methods also take several options:
+### Deserialize
+
+Should you ever need to parse responses yourself, the `deserialize` method will deserialize backend responses into plain old Javascript objects:
 
 ```javascript
-Post.serialize({ prettyPrint: true })
+Post.api.configure(function(config) {
+    config.format = "json";
+});
+
+Post.deserialize('{"title": "My Great Title"}');
+>> {title: "My Great Title"}
+
+Post.api.configure(function(config) {
+    config.format = "xml";
+    config.unwrapRootElement = true;
+});
+
+Post.deserialize('<post><title>My Great Title</title></post>');
+>> {title: "My Great Title"}
 ```
 
-Prints a formatted JSON string.
+### Defining Custom Mimetypes
+
+Out of the box, ngActiveResource defines JSON and XML Mimetypes, which declare serializers and deserializers for those formats.
+
+Formats based on those formats, such as application/vnd.collection+json, or application/vnd.amundsen.maze+xml, will utilize the default serializers and deserializers. You can add additional serializers and deserializers anywhere in the parse chain to handle the semantics of your own Mimetype. 
+
+You can also register your own custom Mimetypes. Here's the JSON Mimetype as an example:
 
 ```javascript
-Post.serialize({ includeEmptyKeys: true })
-```
+angular
+  .module('ngActiveResource')
+  .factory('ARMime.JSON', ['ARMime', function(Mime) {
+    // declare a generic format (".json")
+    var json            = new Mime.Format({name: "json"}),
+    // declare a specific mimetype
+        applicationJson = new Mime.Type({name: "application/json"});
 
-Changes instances of null or undefined to empty strings, in the event your backend requires all properties to be sent with values. If you include `presence` validations on these fields, they will still fail as empty strings, and will not be sent using the built-in methods.
+    // parsers parse API responses into plain old Javascript objects
+    Mime.formats["json"].parsers.push(function(json) {
+      if (_.isObject(json)) { return json; }
+      if (_.isString(json)) { return JSON.parse(json); }
+    });
 
-```javascript
-var dummyData = { hi: 'there' };
-post.toJSON({ instance: dummyData });
-```
+    // formatters format plain old Javascript objects into a serialized format
+    Mime.formats["json"].formatters.push(JSON.stringify);
 
-Can tap into ActiveResource's serialization method to serialize arbitrary
-Javascript objects. If the `instance` option is not passed, the model instance
-itself will be serialized.
+    return JSON;
 
-`serialize` and `toJSON` are non-mutating methods. They will not change the
-instance itself. To save the serialized data as a variable, assign it:
-
-```javascript
-var json = post.serialize();
+  }]);
 ```
 
 ## Dirty:
