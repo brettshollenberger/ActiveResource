@@ -110,4 +110,21 @@ describe("ARDirty", function() {
     post.tags = ["one", "two", "three", "schfoor"];
     expect(post.dirty()).toEqual(false);
   });
+
+  describe("Options", function() {
+    var comment;
+    beforeEach(function() {
+      comment = post.comments.new();
+    });
+
+    it("ignores associations by default", function() {
+      expect(comment.dirty()).toBe(false);
+      expect(comment.changedAttributes()).toEqual([]);
+    });
+
+    it("can be configured to check associations", function() {
+      expect(comment.dirty({ignoreAssociations: false})).toBe(true);
+      expect(comment.changedAttributes({ignoreAssociations: false})).toEqual(["post_id"]);
+    });
+  });
 });
