@@ -13,6 +13,15 @@ describe('ARAPI', function() {
         .toEqual("https://api.edmodo.com/posts/The Abstractions Are Leaking!.json?id=1");
     });
 
+    it("serializes associations to replace params", function() {
+      Comment.api.configure(function(config) {
+        config.baseURL = "http://api.edmodo.com/posts/:post_id";
+      });
+
+      expect(Comment.api.get("index", {published: true, post: {id: 2}}))
+        .toEqual("http://api.edmodo.com/posts/2/comments.json?published=true");
+    });
+
     it("checks parameterizePARAM function to parameterize", function() {
       Post.api.showURL = "/posts/:title";
 
