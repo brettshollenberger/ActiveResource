@@ -3323,6 +3323,7 @@ angular.module('ngActiveResource').factory('ARValidatable.Validator', [
       if (!_.isFunction(validationFn))
         throw new ValidatorNotFoundError(name);
       this.name = validationFn.name || name;
+      this.title = validationFn.title || name;
       this.message = validationFn.message;
       this.configure = function (options) {
         options = defaultOptions(options);
@@ -3381,6 +3382,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.absence', [
     }
     ;
     absence.message = 'must be blank.';
+    absence.title = 'absence';
     return new Validator(absence);
   }
 ]);
@@ -3402,6 +3404,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.acceptance'
     acceptance.message = function () {
       return 'must be accepted.';
     };
+    acceptance.title = 'acceptance';
     return new Validator(acceptance);
   }
 ]);
@@ -3417,6 +3420,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.boolean', [
     boolean.message = function () {
       return 'is not a boolean';
     };
+    boolean.title = 'boolean';
     return new Validator(boolean);
   }
 ]);
@@ -3432,6 +3436,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.confirmatio
     confirmation.message = function () {
       return 'must match confirmation field.';
     };
+    confirmation.title = 'confirmation';
     return new Validator(confirmation);
   }
 ]);
@@ -3462,6 +3467,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.exclusion',
         list = joinedArray.join(' ');
       return 'must not be ' + list + '.';
     };
+    exclusion.title = 'exclusion';
     return new Validator(exclusion);
   }
 ]);
@@ -3477,6 +3483,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.format.emai
     email.message = function () {
       return 'is not a valid email.';
     };
+    email.title = 'email';
     return new Validator(email);
   }
 ]);
@@ -3495,6 +3502,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.format', [
       zip: zip,
       regex: regex
     };
+    format.title = 'format';
     return new Validator(format);
   }
 ]);
@@ -3510,6 +3518,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.format.rege
     regex.message = function () {
       return 'does not match the pattern.';
     };
+    regex.title = 'regex';
     return new Validator(regex);
   }
 ]);
@@ -3525,6 +3534,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.format.zip'
     zip.message = function () {
       return 'is not a valid zip code.';
     };
+    zip.title = 'zip';
     return new Validator(zip);
   }
 ]);
@@ -3555,6 +3565,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.inclusion',
         list = joinedArray.join(' ');
       return 'must be included in ' + list + '.';
     };
+    inclusion.title = 'inclusion';
     return new Validator(inclusion);
   }
 ]);
@@ -3580,6 +3591,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.integer', [
     integer.message = function () {
       return 'is not an integer.';
     };
+    integer.title = 'integer';
     return new Validator(integer);
   }
 ]);
@@ -3595,6 +3607,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.length.in',
     inRange.message = function () {
       return 'must be between ' + this.inRange[0] + ' and ' + this.inRange.slice(-1)[0] + ' characters.';
     };
+    inRange.title = 'in';
     return new Validator(inRange);
   }
 ]);
@@ -3610,6 +3623,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.length.is',
     is.message = function () {
       return 'must be ' + this.is + ' characters.';
     };
+    is.title = 'is';
     return new Validator(is);
   }
 ]);
@@ -3630,6 +3644,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.length', [
       in: inRange,
       is: is
     };
+    length.title = 'length';
     return new Validator(length);
   }
 ]);
@@ -3645,6 +3660,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.length.max'
     max.message = function () {
       return 'Must be no more than ' + this.max + ' characters';
     };
+    max.title = 'max';
     return new Validator(max);
   }
 ]);
@@ -3659,6 +3675,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.length.min'
     min.message = function () {
       return 'Must be at least ' + this.min + ' characters';
     };
+    min.title = 'min';
     return new Validator(min);
   }
 ]);
@@ -3678,6 +3695,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.numericalit
     numericality.message = function () {
       return 'is not a number.';
     };
+    numericality.title = 'numericality';
     return new Validator(numericality);
   }
 ]);
@@ -3698,6 +3716,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.requiredIf'
     }
     ;
     requiredIf.message = 'cannot be blank.';
+    requiredIf.title = 'requiredIf';
     return new Validator(requiredIf);
   }
 ]);
@@ -3714,6 +3733,7 @@ angular.module('ngActiveResource').factory('ARValidatable.validators.required', 
     }
     ;
     required.message = 'cannot be blank.';
+    required.title = 'required';
     return new Validator(required);
   }
 ]);
@@ -3722,10 +3742,11 @@ angular.module('ngActiveResource').factory('ARValidatable.validators', [
   function (DuplicateValidatorError) {
     var validators = {};
     validators.register = function (validator) {
-      if (_.isUndefined(validators[validator.name]))
-        validators[validator.name] = validator;
+      var title = validator.title || validator.name;
+      if (_.isUndefined(validators[title]))
+        validators[title] = validator;
       else
-        throw new DuplicateValidatorError(validator.name);
+        throw new DuplicateValidatorError(title);
     };
     validators.find = function (validatorName) {
       return validators[validatorName];
