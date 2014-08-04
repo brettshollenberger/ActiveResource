@@ -2298,6 +2298,7 @@ angular.module('ngActiveResource').factory('ARUpdatable', [function () {
         _.each(attributes, this.updateAttribute, this);
         this.constructor.emit('update:beginning', this, attributes);
         this.constructor.emit('update:complete', this, attributes);
+        return this;
       };
       this.__updateAttribute = function (val, key) {
         if (_.isUndefined(this.constructor.reflectOnAssociation(key))) {
