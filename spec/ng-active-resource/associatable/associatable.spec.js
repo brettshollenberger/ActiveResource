@@ -33,6 +33,13 @@ describe("ARAssociatable", function() {
 
         expect(post.comments.first().post).toBe(post);
       });
+
+      it("does not add instances to the associated collection unless they have a primary key", function() {
+        post    = Post.new({id: 1});
+        comment = post.comments.new();
+
+        expect(post.comments).not.toContain(comment);
+      });
     });
 
     describe("#$create", function() {
