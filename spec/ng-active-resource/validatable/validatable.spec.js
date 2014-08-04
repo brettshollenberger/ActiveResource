@@ -561,5 +561,29 @@ describe("ARValidatable", function() {
       expect(person.$errors.password).toContain("must match confirmation field.");
     });
 
+    describe("#validateIfErrored", function() { 
+      it("validates if the instance is errored", function() {
+        person.username = undefined;
+        person.email    = undefined;
+        person.validate();
+
+        expect(person.validateIfErrored()).toBe(false);
+      });
+
+      it("does not run if the instance is not errored", function() {
+        expect(person.validateIfErrored()).toEqual(undefined);
+      });
+
+      it("runs particular fields", function() {
+        person.name     = "abc";
+        person.username = undefined;
+        person.email    = undefined;
+        person.validate();
+
+        person.username = "troy";
+        expect(person.validateIfErrored("username")).toBe(true);
+        expect(person.validateIfErrored("name")).toBe(false);
+      });
+    });
   });
 });
