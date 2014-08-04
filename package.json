@@ -1,19 +1,16 @@
 {
   "name": "ActiveResource",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "RESTful resource modeling",
   "main": "index.js",
   "author": "Brett Shollenberger <brett@facultycreative.com>",
   "license": "MIT",
   "dependencies": {
     "lodash": "latest"
+    "active-support": "0.1.1"
   },
   "devDependencies": {
-    "faculty-api": "0.1.1",
-    "bcryptjs": "latest",
     "load-grunt-tasks": "latest",
-    "express": "latest",
-    "mongoose": "latest",
     "grunt": "latest",
     "grunt-contrib-watch": "latest",
     "grunt-shell": "latest",
