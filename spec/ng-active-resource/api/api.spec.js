@@ -22,6 +22,15 @@ describe('ARAPI', function() {
         .toEqual("http://api.edmodo.com/posts/2/comments.json?published=true");
     });
 
+    it("does not replace port numbers", function() {
+      Comment.api.configure(function(config) {
+        config.baseURL = "http://localhost:3000/posts/:post_id";
+      });
+
+      expect(Comment.api.get("index", {published: true, post: {id: 2}}))
+        .toEqual("http://localhost:3000/posts/2/comments.json?published=true");
+    });
+
     it("checks parameterizePARAM function to parameterize", function() {
       Post.api.showURL = "/posts/:title";
 
