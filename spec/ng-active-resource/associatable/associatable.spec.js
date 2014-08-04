@@ -40,6 +40,20 @@ describe("ARAssociatable", function() {
 
         expect(post.comments).not.toContain(comment);
       });
+
+      iit("adds instances to collection associations on save if they contain a primary key", function() {
+        backend.expectPOST("https://api.edmodo.com/comments.json")
+               .respond({id: 2, post_id: 1});
+
+        post    = Post.new({id: 1});
+        comment = post.comments.new();
+        expect(post.comments).not.toContain(comment);
+
+        comment.$save();
+        backend.flush();
+
+        expect(post.comments).toContain(comment);
+      });
     });
 
     describe("#$create", function() {
