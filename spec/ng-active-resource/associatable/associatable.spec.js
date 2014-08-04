@@ -64,6 +64,14 @@ describe("ARAssociatable", function() {
 
         expect(post.comments).toContain(comment);
       });
+
+      it("configures addition of instance to collection association without primary key", function() {
+        Comment.belongsTo("post", {includeWithoutPrimaryKey: true});
+
+        post    = Post.new({id: 1});
+        comment = post.comments.new();
+        expect(post.comments).toContain(comment);
+      });
     });
 
     describe("#$create", function() {
