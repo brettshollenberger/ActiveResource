@@ -30,7 +30,8 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['lib/ng-active-resource/**/*.js'],
+        src: ['lib/ng-active-resource/ng-active-resource.js',
+              'lib/ng-active-resource/**/*.js'],
         dest: '.tmp/ng-active-resource.js'
       }
     },
