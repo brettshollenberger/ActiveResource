@@ -37,6 +37,10 @@ describe("Deserializable", function() {
       expect(Post.deserialize(posts)[0].author_id).toEqual(2);
     });
 
+    it("deserializes empty strings", function() {
+      expect(Post.deserialize("")).toEqual({});
+    });
+
     it("deserializes xml", function() {
       Post.api.configure(function(config) {
         config.format            = "xml";
