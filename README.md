@@ -4,8 +4,8 @@ ActiveResource provides a Base class to make modelling with Angular easier. It
 provides associations, caching, API integration, validations, and Active Record
 pattern persistence methods.
 
-[Installation](#installation)
-[Writing A Model](#writing-a-model)
+* [Installation](#installation)
+* [Writing A Model](#writing-a-model)
 
 ## Installation:
 
