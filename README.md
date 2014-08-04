@@ -6,6 +6,17 @@ pattern persistence methods.
 
 * [Installation](#installation)
 * [Writing A Model](#writing-a-model)
+* [Declaring Your API](#declaring-your-api)
+* [Computed Properties](#computed-properties)
+* [Establishing Associations](#establish-associations)
+* [RESTful Interface](#methods)
+* [Custom Primary Keys](#custom-primary-keys)
+* [Dependent-Destroy](#dependent-destroy-associations)
+* [Serialization](#serialization)
+* [Defining Custom Mimetypes](#defining-custom-mimetypes)
+* [Dirty](#dirty)
+* [Changed Attributes](#changed-attributes)
+* [Validations](#validations)
 
 ## Installation:
 
