@@ -35,11 +35,6 @@ describe("ARDeletable", function() {
     it("is removed from the identity map style cache", function() {
       expect(Post.findCached(post)).toBeUndefined();
     });
-
-    it("removes instances from cached queries", function() {
-      expect(Post.queryCache.find({author_id: 1})).not.toContain(post);
-      expect(Post.queryCache.find({author_id: 1})).toContain(post2);
-    });
   });
 
   describe("Deleting associated instances", function() {

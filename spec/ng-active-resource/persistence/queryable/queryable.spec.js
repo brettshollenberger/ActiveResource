@@ -30,36 +30,11 @@ describe("ARQueryable", function() {
     expect(posts.length).toEqual(2);
   });
 
-  it("returns queries from the cache if they've already been performed", function() {
-    var posts  = Post.where({author_id: 1});
-    backend.flush();
-
-    var posts2 = Post.where({author_id: 1});
-
-    expect(posts.first()).toEqual(posts2.first());
-  });
-
-  it("stashes duplicate queries to resolve when the original returns", function() {
-    var posts  = Post.where({author_id: 1});
-    var posts2 = Post.where({author_id: 1});
-
-    backend.flush();
-
-    expect(posts.first()).toEqual(posts2.first());
-  });
-
   it("transforms the json into model instances", function() {
     var posts = Post.where({author_id: 1});
     backend.flush();
 
     expect(posts.first().constructor).toEqual(Post);
-  });
-
-  it("saves the response to the query", function() {
-    var posts = Post.where({author_id: 1});
-    backend.flush();
-
-    expect(Post.queryCache.find({author_id:1})).toEqual(posts);
   });
 
   it("grabs associations", function() {
