@@ -61,14 +61,14 @@ describe("ARHTTPConfig", function() {
   });
 
   it("uses params on where action", function() {
-    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&api_token=1234")
+    backend.whenGET("https://api.edmodo.com/posts.json?api_token=1234&author_id=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1}], {});
 
     var posts = Post.where({author_id: 1});
 
     backend.flush();
 
-    expect($http.get.mostRecentCall.args[1].params).toEqual({api_token: "1234"});
+    expect($http.get.mostRecentCall.args[1].params).toEqual({api_token: "1234", author_id: 1});
   });
 
   it("adds arbitrary attributes to the $http configuration", function() {

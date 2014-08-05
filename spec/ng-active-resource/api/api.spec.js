@@ -1,16 +1,25 @@
 describe('ARAPI', function() {
-  describe("api#get", function() {
-    it("parameterizes params that exist on instances", function() {
-      expect(Post.api.get("show", {id: 1})).toEqual("https://api.edmodo.com/posts/1.json");
+  describe("api#generateRequest", function() {
+    it("parameterizes params that exist on instances and updates the config", function() {
+      var config = {params: {id: 1}},
+          url    = Post.api.generateRequest("show", config);
+
+      expect(url).toEqual("https://api.edmodo.com/posts/1.json");
+      expect(config.params).toBeUndefined();
     });
 
-    it("replaces any params", function() {
+    it("replaces any params and updates the config", function() {
       Post.api.configure(function(config) {
         config.showURL = "/posts/:title";
       });
 
-      expect(Post.api.get("show", {id: 1, title: "The Abstractions Are Leaking!"}))
-        .toEqual("https://api.edmodo.com/posts/The Abstractions Are Leaking!.json?id=1");
+      var config = {params: {id: 1, title: "The Abstractions Are Leaking!"}},
+          url    = Post.api.generateRequest("show", config);
+
+      expect(url)
+        .toEqual("https://api.edmodo.com/posts/The Abstractions Are Leaking!.json");
+
+      expect(config.params).toEqual({ id: 1 });
     });
 
     it("serializes associations to replace params", function() {
@@ -18,8 +27,13 @@ describe('ARAPI', function() {
         config.baseURL = "http://api.edmodo.com/posts/:post_id";
       });
 
-      expect(Comment.api.get("index", {published: true, post: {id: 2}}))
-        .toEqual("http://api.edmodo.com/posts/2/comments.json?published=true");
+      var config = {params: {published: true, post: {id: 2}}},
+          url    = Comment.api.generateRequest("index", config);
+
+      expect(url)
+        .toEqual("http://api.edmodo.com/posts/2/comments.json");
+
+      expect(config.params).toEqual({published: true});
     });
 
     it("does not replace port numbers", function() {
@@ -27,8 +41,13 @@ describe('ARAPI', function() {
         config.baseURL = "http://localhost:3000/posts/:post_id";
       });
 
-      expect(Comment.api.get("index", {published: true, post: {id: 2}}))
-        .toEqual("http://localhost:3000/posts/2/comments.json?published=true");
+      var config = { params: {published: true, post: {id: 2}}},
+          url    = Comment.api.generateRequest("index", config);
+
+      expect(url)
+        .toEqual("http://localhost:3000/posts/2/comments.json");
+
+      expect(config.params).toEqual({published: true});
     });
 
     it("checks parameterizePARAM function to parameterize", function() {
@@ -38,37 +57,76 @@ describe('ARAPI', function() {
         return title.split(" ").join("-").toLowerCase().replace(/[\!\?]/g, '');
       }
 
-      expect(Post.api.get("show", {title: "The Abstractions Are Leaking!"}))
+      var config = { params:  {title: "The Abstractions Are Leaking!"}},
+          url    = Post.api.generateRequest("show", config);
+
+      expect(url)
         .toEqual("https://api.edmodo.com/posts/the-abstractions-are-leaking.json");
+
+      expect(config.params).toBeUndefined({});
     });
 
-    it("appends a query string with the rest of the parameters for GET type URLs", function() {
-      expect(Post.api.get("show", {id: 1, author_id: 1, public: true})).toEqual(
-        "https://api.edmodo.com/posts/1.json?author_id=1&public=true");
+    it("updates the config with parameters to append to the query string", function() {
+      var config = { params: {id: 1, author_id: 1, public: true}},
+          url    = Post.api.generateRequest("show", config);
 
-      expect(Post.api.get("index", {author_id: 1, public: true}))
-        .toEqual("https://api.edmodo.com/posts.json?author_id=1&public=true");
-    });
+      expect(url).toEqual(
+        "https://api.edmodo.com/posts/1.json");
 
-    it("only parameterizes params for delete action", function() {
-      expect(Post.api.get("delete", {id: 1, public: true}))
-        .toEqual("https://api.edmodo.com/posts/1.json");
-    });
+      expect(config.params).toEqual({
+        author_id: 1,
+        public: true
+      });
 
-    it("only parameterizes params for update action", function() {
-      expect(Post.api.get("update", {id: 1, public: true}))
-        .toEqual("https://api.edmodo.com/posts/1.json");
-    });
+      config = { params: {author_id: 1, public: true}};
+      url    = Post.api.generateRequest("index", config);
 
-    it("appends no query string for create action", function() {
-      expect(Post.api.get("create", {id: 1, public: true}))
+      expect(url)
         .toEqual("https://api.edmodo.com/posts.json");
+
+      expect(config.params).toEqual({
+        author_id: 1,
+        public: true
+      });
+    });
+
+    it("parameterizes for delete", function() {
+      var config = { params: {id: 1, public: true}},
+          url    = Post.api.generateRequest("delete", config)
+
+      expect(url)
+        .toEqual("https://api.edmodo.com/posts/1.json");
+
+      expect(config.params).toEqual({public: true});
+    });
+
+    it("parameterizes for update", function() {
+      var config = { params: {id: 1, public: true}},
+          url    = Post.api.generateRequest("update", config)
+
+      expect(url)
+        .toEqual("https://api.edmodo.com/posts/1.json");
+
+      expect(config.params).toEqual({public: true});
+    });
+
+    it("does not parameterize url for creates", function() {
+      var config = { params: {id: 1, public: true}},
+          url    = Post.api.generateRequest("create", config)
+
+      expect(url)
+        .toEqual("https://api.edmodo.com/posts.json");
+
+      expect(config.params).toEqual({id: 1, public: true});
     });
   });
 
   describe("Format", function() {
     it("appends formats", function() {
-      expect(Post.api.get("index", {})).toEqual("https://api.edmodo.com/posts.json");
+      var config = {},
+          url    = Post.api.generateRequest("index", config);
+
+      expect(url).toEqual("https://api.edmodo.com/posts.json");
     });
   });
 
@@ -78,7 +136,7 @@ describe('ARAPI', function() {
         api.appendFormat = false;
       });
 
-      expect(Post.api.get("index", {})).toEqual("https://api.edmodo.com/posts");
+      expect(Post.api.generateRequest("index", {})).toEqual("https://api.edmodo.com/posts");
     });
 
     it("can be configured at a global level", function() {
@@ -94,7 +152,7 @@ describe('ARAPI', function() {
         config.resource = "user";
       });
 
-      expect(Member.api.get("index", {})).toEqual("https://api.edmodo.com/users.xml");
+      expect(Member.api.generateRequest("index", {})).toEqual("https://api.edmodo.com/users.xml");
     });
 
     it("is overridden by model-specific configuration", function() {
@@ -107,8 +165,8 @@ describe('ARAPI', function() {
       function User() {}
       User.inherits(ngActiveResource.Base);
 
-      expect(User.api.get("index", {})).toEqual("https://api.edmodo.com/v1/users");
-      expect(Post.api.get("index", {})).toEqual("https://api.edmodo.com/posts.json");
+      expect(User.api.generateRequest("index", {})).toEqual("https://api.edmodo.com/v1/users");
+      expect(Post.api.generateRequest("index", {})).toEqual("https://api.edmodo.com/posts.json");
     });
   });
 });
