@@ -1,4 +1,4 @@
-describe("ARPaginatable", function() {
+xdescribe("ARPaginatable", function() {
 
   describe("Starting at the beginning of a list", function() {
     var posts;

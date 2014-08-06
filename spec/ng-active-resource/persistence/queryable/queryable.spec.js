@@ -1,10 +1,10 @@
 describe("ARQueryable", function() {
   beforeEach(function() {
-    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1")
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
 
-    backend.whenGET("https://api.edmodo.com/posts.json")
+    backend.whenGET("https://api.edmodo.com/posts.json?page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
   });

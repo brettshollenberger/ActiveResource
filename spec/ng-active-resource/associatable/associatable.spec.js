@@ -91,7 +91,7 @@ describe("ARAssociatable", function() {
 
     describe("#where", function() {
       it("queries the association", function() {
-        backend.whenGET("https://api.edmodo.com/comments.json?post_id=1")
+        backend.whenGET("https://api.edmodo.com/comments.json?page=1&post_id=1")
                .respond(200, [{id: 2, body: "Great post!", post_id: 1},
                               {id: 3, body: "Awesome!", post_id: 1}]);
 
@@ -109,7 +109,7 @@ describe("ARAssociatable", function() {
 
     describe("#findAll", function() {
       it("is like #where with no arguments", function() {
-        backend.whenGET("https://api.edmodo.com/comments.json?post_id=1")
+        backend.whenGET("https://api.edmodo.com/comments.json?page=1&post_id=1")
                .respond(200, [{id: 2, body: "Great post!", post_id: 1},
                               {id: 3, body: "Awesome!", post_id: 1}]);
 

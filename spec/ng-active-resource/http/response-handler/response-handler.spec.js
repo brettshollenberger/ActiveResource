@@ -1,13 +1,13 @@
 describe("ARResponseHandler", function() {
   beforeEach(function() {
-    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1")
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
 
-    backend.whenGET("https://api.edmodo.com/posts.json?author_id=2")
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=1")
       .respond(500, {error: "Internal server error"}, {});
 
-    backend.whenGET("https://api.edmodo.com/comments.json?post_id=1")
+    backend.whenGET("https://api.edmodo.com/comments.json?page=1&post_id=1")
       .respond(200, {error: "Internal server error"}, {});
   });
 

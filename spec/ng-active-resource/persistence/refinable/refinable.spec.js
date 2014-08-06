@@ -1,4 +1,4 @@
-ddescribe("ARRefinable", function() {
+describe("ARRefinable", function() {
   beforeEach(function() {
     backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
