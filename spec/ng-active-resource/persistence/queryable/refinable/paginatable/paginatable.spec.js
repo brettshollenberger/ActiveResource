@@ -22,23 +22,23 @@ describe("ARPaginatable", function() {
         {'Link': 
           '<https://api.edmodo.com/posts.json?author_id=1&page=3&per_page=5>; rel="previous", <https://api.edmodo.com/posts.json?author_id=1&page=5&per_page=5; rel="next"'});
 
-          backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=5&per_page=5")
-            .respond(200, [{id: 21}, {id: 22}, {id: 23}, {id: 24}, {id: 25}],
-                {'Link': 
-                  '<https://api.edmodo.com/posts.json?author_id=1&page=4&per_page=5>; rel="previous"'});
+        backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=5&per_page=5")
+          .respond(200, [{id: 21}, {id: 22}, {id: 23}, {id: 24}, {id: 25}],
+              {'Link': 
+                '<https://api.edmodo.com/posts.json?author_id=1&page=4&per_page=5>; rel="previous"'});
 
-          backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=1&per_page=1")
-            .respond(200, [{id: 200}],
-                {'Link': 
-                  '<https://api.edmodo.com/posts.json?author_id=2&page=2&per_page=1>; rel="next"'});
+        backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=1&per_page=1")
+          .respond(200, [{id: 200}],
+              {'Link': 
+                '<https://api.edmodo.com/posts.json?author_id=2&page=2&per_page=1>; rel="next"'});
 
-          backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=2&per_page=1")
-            .respond(200, [{id: 201}],
-                {'Link': 
-                  '<https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1>; rel="next", <https://api.edmodo.com/posts.json?author_id=2&page=1&per_page=1; rel="previous"'});
+        backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=2&per_page=1")
+          .respond(200, [{id: 201}],
+              {'Link': 
+                '<https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1>; rel="next", <https://api.edmodo.com/posts.json?author_id=2&page=1&per_page=1; rel="previous"'});
 
-          backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1")
-            .respond(200, [{id: 202}]);
+        backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1")
+          .respond(200, [{id: 202}]);
 
       posts = Post.where({author_id: 1, page: 3, per_page: 5});
 
