@@ -27,6 +27,19 @@ describe("ARPaginatable", function() {
                 {'Link': 
                   '<https://api.edmodo.com/posts.json?author_id=1&page=4&per_page=5>; rel="previous"'});
 
+          backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=1&per_page=1")
+            .respond(200, [{id: 200}],
+                {'Link': 
+                  '<https://api.edmodo.com/posts.json?author_id=2&page=2&per_page=1>; rel="next"'});
+
+          backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=2&per_page=1")
+            .respond(200, [{id: 201}],
+                {'Link': 
+                  '<https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1>; rel="next", <https://api.edmodo.com/posts.json?author_id=2&page=1&per_page=1; rel="previous"'});
+
+          backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1")
+            .respond(200, [{id: 202}]);
+
       posts = Post.where({author_id: 1, page: 3, per_page: 5});
 
       spyOn($http, "get").andCallThrough();
@@ -132,6 +145,25 @@ describe("ARPaginatable", function() {
       posts.previous_page();
       $timeout.flush();
       expect(posts.previous_page_exists()).toBe(false);
+    });
+
+    it("disposes old pagination when other parameters change", function() {
+      posts.where({author_id: 2, per_page: 1});
+      backend.flush();
+
+      expect(posts.first().id).toEqual(200);
+      expect(posts.last().id).toEqual(200);
+
+      posts.next_page();
+      backend.flush();
+
+      expect(posts.first().id).toEqual(201);
+
+      posts.next_page();
+      expect(posts.first().id).toEqual(202);
+
+      posts.previous_page();
+      expect(posts.first().id).toEqual(201);
     });
   });
 });
