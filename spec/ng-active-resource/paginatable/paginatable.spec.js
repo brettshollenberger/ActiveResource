@@ -1,4 +1,4 @@
-describe("ARPaginatable", function() {
+ddescribe("ARPaginatable", function() {
   describe("Starting in the middle of a list", function() {
     var posts;
     beforeEach(function() {
@@ -48,6 +48,14 @@ describe("ARPaginatable", function() {
       expect(posts.last().id).toEqual(20);
     });
 
+    it("moves to the previous page", function() {
+      backend.flush();
+      posts.previous_page();
+
+      expect(posts.first().id).toEqual(6);
+      expect(posts.last().id).toEqual(10);
+    });
+
     it("stores hypermedia", function() {
       expect(posts.paginationHypermedia().next.params).toEqual({
         author_id: 1,
@@ -83,6 +91,23 @@ describe("ARPaginatable", function() {
     });
 
     it("preloads hypermedia when it moves to the previous page", function() {
+      backend.flush();
+      posts.previous_page();
+      backend.flush();
+
+      expect(posts.first().id).toEqual(6);
+      expect(posts.last().id).toEqual(10);
+
+      expect(posts.paginationHypermedia().previous.params).toEqual({
+        author_id: 1,
+        page: 1,
+        per_page: 5
+      });
+
+      posts.previous_page();
+
+      expect(posts.first().id).toEqual(1);
+      expect(posts.last().id).toEqual(5);
     });
   });
 });
