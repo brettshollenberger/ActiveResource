@@ -1,6 +1,6 @@
 ddescribe("ARRefinable", function() {
   beforeEach(function() {
-    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1")
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
 
@@ -27,21 +27,21 @@ ddescribe("ARRefinable", function() {
     expect(posts.first().id).toEqual(1);
   });
 
-  it("stashes queries", function() {
+  it("stashes queries and automatically adds pagination if not defined", function() {
     var posts = new ngActiveResource.Refinable(Post);
     posts.where({author_id: 1});
     backend.flush();
 
-    expect(posts.queries.find({author_id: 1}).first()).toEqual(posts.first());
-    expect(posts.queries.find({author_id: 1}).last()).toEqual(posts.last());
+    expect(posts.queries.find({author_id: 1, page: 1}).first()).toEqual(posts.first());
+    expect(posts.queries.find({author_id: 1, page: 1}).last()).toEqual(posts.last());
   });
 
-  iit("stashes the most recent call", function() {
+  it("stashes the most recent call, automatically adding pagination", function() {
     var posts = new ngActiveResource.Refinable(Post);
     posts.where({author_id: 1});
     backend.flush();
 
-    expect(posts.mostRecentCall).toEqual({author_id: 1});
+    expect(posts.mostRecentCall).toEqual({author_id: 1, page: 1});
   });
 
   it("refines queries", function() {
@@ -53,23 +53,20 @@ ddescribe("ARRefinable", function() {
 
     expect(posts.first().id).toEqual(3);
     expect(posts.last().id).toEqual(4);
+
+    expect(posts.queries.find({author_id: 1, page: 2}).first()).toEqual(posts.first());
+    expect(posts.queries.find({author_id: 1, page: 2}).last()).toEqual(posts.last());
   });
 
-  it("transforms the json into model instances", function() {
-    var posts = Post.where({author_id: 1});
+  it("reverts to cached queries when possible", function() {
+    var posts = new ngActiveResource.Refinable(Post);
+    posts.where({author_id: 1});
     backend.flush();
-
-    expect(posts.first().constructor).toEqual(Post);
-  });
-
-  it("grabs associations", function() {
-    var author = Author.new({id: 1, name: "Jane Austen"});
-    var posts  = Post.where({author_id: 1});
-
+    posts.where({page: 2});
     backend.flush();
+    posts.where({page: 1});
 
-    posts.each(function(post) {
-      expect(post.author).toEqual(author);
-    });
+    expect(posts.first().id).toEqual(1);
+    expect(posts.last().id).toEqual(2);
   });
 });
