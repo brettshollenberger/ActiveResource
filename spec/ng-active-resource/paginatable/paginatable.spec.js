@@ -160,7 +160,7 @@ describe("ARPaginatable", function() {
     });
   });
 
-  ddescribe("Starting in the middle of a list", function() {
+  describe("Starting in the middle of a list", function() {
     var posts;
     beforeEach(function() {
       backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5")
@@ -223,7 +223,7 @@ describe("ARPaginatable", function() {
       expect(posts.current_page().last().id).toEqual(20);
     });
 
-    iit("properly adds previous page hypermedia", function() {
+    it("properly adds previous page hypermedia", function() {
       backend.flush();
       expect(posts.__next_page_hypermedia().params.page).toEqual(5);
       expect(posts.__previous_page_hypermedia().params.page).toEqual(1);
