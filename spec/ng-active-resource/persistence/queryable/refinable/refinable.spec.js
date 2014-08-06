@@ -7,6 +7,10 @@ describe("ARRefinable", function() {
     backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=2")
       .respond(200, [{id: 3, title: "A very new post", author_id: 1},
                 {id: 4, title: "My favorite thangs", author_id: 1}], {});
+
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=3")
+      .respond(200, [{id: 5, title: "The new post", author_id: 1},
+                {id: 6, title: "Super gr8", author_id: 1}], {});
   });
 
   it("creates an empty query set", function() {
@@ -68,5 +72,21 @@ describe("ARRefinable", function() {
 
     expect(posts.first().id).toEqual(1);
     expect(posts.last().id).toEqual(2);
+  });
+
+  it("preloads queries", function() {
+    var posts = new ngActiveResource.Refinable(Post);
+    posts.where({author_id: 1});
+    backend.flush();
+    posts.where({page: 3}, {preload: true});
+    backend.flush();
+
+    expect(posts.first().id).toEqual(1);
+    expect(posts.last().id).toEqual(2);
+
+    posts.where({page: 3});
+
+    expect(posts.first().id).toEqual(5);
+    expect(posts.last().id).toEqual(6);
   });
 });
