@@ -69,6 +69,15 @@ describe("ARPaginatable", function() {
       expect(posts.last().id).toEqual(10);
     });
 
+    it("moves to an exact page", function() {
+      backend.flush();
+      posts.page(1);
+      backend.flush();
+
+      expect(posts.first().id).toEqual(1);
+      expect(posts.last().id).toEqual(5);
+    });
+
     it("stores hypermedia", function() {
       expect(posts.paginationHypermedia().next.params).toEqual({
         author_id: 1,
