@@ -176,9 +176,19 @@ describe("ARPaginatable", function() {
           backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=3&per_page=5")
                  .respond(200, [{id: 11}, {id: 12}, {id: 13}, {id: 14}, {id: 15}],
           {'Link': 
-            '<https://api.edmodo.com/posts.json?author_id=1&page=2&per_page=5>; rel="previous"'});
+            '<https://api.edmodo.com/posts.json?author_id=1&page=2&per_page=5>; rel="previous", <https://api.edmodo.com/posts.json?author_id=1&page=4&per_page=5; rel="next"'});
 
-          posts = Post.where({author_id: 1, page: 2, per_page: 5});
+          backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=4&per_page=5")
+                 .respond(200, [{id: 16}, {id: 17}, {id: 18}, {id: 19}, {id: 20}],
+          {'Link': 
+            '<https://api.edmodo.com/posts.json?author_id=1&page=3&per_page=5>; rel="previous", <https://api.edmodo.com/posts.json?author_id=1&page=5&per_page=5; rel="next"'});
+
+          backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=5&per_page=5")
+                 .respond(200, [{id: 21}, {id: 22}, {id: 23}, {id: 24}, {id: 25}],
+          {'Link': 
+            '<https://api.edmodo.com/posts.json?author_id=1&page=4&per_page=5>; rel="previous"'});
+
+          posts = Post.where({author_id: 1, page: 3, per_page: 5});
 
           spyOn($http, "get").andCallThrough();
           backend.flush();
@@ -186,37 +196,37 @@ describe("ARPaginatable", function() {
           posts.paginate({per_page: 5});
     });
 
-    it("starts off on the request page", function() {
-      expect(posts.current_page().first().id).toEqual(6);
-      expect(posts.current_page().last().id).toEqual(10);
+    it("starts off on the requested page", function() {
+      expect(posts.current_page().first().id).toEqual(11);
+      expect(posts.current_page().last().id).toEqual(15);
     });
 
     it("has previous page hypermedia", function() {
-      expect(posts.__previous_page_hypermedia().params.page).toEqual(1);
+      expect(posts.__previous_page_hypermedia().params.page).toEqual(2);
     });
 
     it("has next page hypermedia", function() {
-      expect(posts.__next_page_hypermedia().params.page).toEqual(3);
+      expect(posts.__next_page_hypermedia().params.page).toEqual(4);
     });
 
     it("preloads the previous page", function() {
       backend.flush();
       posts.previous_page();
-      expect(posts.current_page().first().id).toEqual(1);
-      expect(posts.current_page().last().id).toEqual(5);
+      expect(posts.current_page().first().id).toEqual(6);
+      expect(posts.current_page().last().id).toEqual(10);
     });
 
     it("preloads the next page", function() {
       backend.flush();
       posts.next_page();
-      expect(posts.current_page().first().id).toEqual(11);
-      expect(posts.current_page().last().id).toEqual(15);
+      expect(posts.current_page().first().id).toEqual(16);
+      expect(posts.current_page().last().id).toEqual(20);
     });
 
-    it("properly adds previous page hypermedia", function() {
+    iit("properly adds previous page hypermedia", function() {
       backend.flush();
-      expect(posts.__next_page_hypermedia()).toBeUndefined();
-      expect(posts.__previous_page_hypermedia()).toBeUndefined();
+      expect(posts.__next_page_hypermedia().params.page).toEqual(5);
+      expect(posts.__previous_page_hypermedia().params.page).toEqual(1);
     });
   });
 });
