@@ -1,9 +1,9 @@
 {
   "name": "ActiveResource",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "description": "RESTful resource modeling",
   "main": "index.js",
-  "author": "Brett Shollenberger <brett@facultycreative.com>",
+  "author": "Brett Shollenberger <brett.shollenberger@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "lodash": "latest",
