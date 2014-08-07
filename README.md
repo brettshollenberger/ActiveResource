@@ -617,6 +617,19 @@ posts = Post.where({ author_id: author.id }).then(function() {
 });
 ```
 
+The returned array can be further refined via `where`. It will update in-place:
+
+```javascript
+posts.where({published: true});
+```
+
+This can be especially useful when you're writing components for a search
+interface:
+
+```html
+<input ng-model="query" ng-change="posts.where({query: query})">
+```
+
 ### findAll:
 
 Returns all instances.
