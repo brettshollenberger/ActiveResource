@@ -83,8 +83,8 @@ describe("ARSaveable", function() {
     var post;
     beforeEach(function() {
       Post.api.configure(function(config) {
-        config.format            = "xml";
-        config.unwrapRootElement = true;
+        config.format     = "xml";
+        config.unwrapRoot = true;
       });
 
       backend.whenPOST("https://api.edmodo.com/posts.xml").respond(

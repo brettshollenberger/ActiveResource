@@ -33,8 +33,8 @@ describe("ARFindable", function() {
 
   it("deserializes backend responses", function() {
     Post.api.configure(function(config) {
-      config.format            = "xml";
-      config.unwrapRootElement = true;
+      config.format     = "xml";
+      config.unwrapRoot = true;
     });
 
     var post = Post.find(1);

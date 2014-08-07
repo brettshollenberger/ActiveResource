@@ -79,8 +79,8 @@ describe("Serializable", function() {
 
     it("serializes xml", function() {
       Post.api.configure(function(config) {
-        config.format            = "xml";
-        config.unwrapRootElement = true;
+        config.format     = "xml";
+        config.unwrapRoot = true;
       });
 
       expect(Post.serialize(post)).toEqual(xml);

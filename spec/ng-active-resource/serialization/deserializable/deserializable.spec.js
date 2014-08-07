@@ -43,8 +43,8 @@ describe("Deserializable", function() {
 
     it("deserializes xml", function() {
       Post.api.configure(function(config) {
-        config.format            = "xml";
-        config.unwrapRootElement = true;
+        config.format     = "xml";
+        config.unwrapRoot = true;
       });
 
       expect(Post.deserialize(xml).author_id).toEqual(2);
