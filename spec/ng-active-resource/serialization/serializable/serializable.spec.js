@@ -16,6 +16,17 @@ describe("Serializable", function() {
         .toEqual('{"id":1,"title":"My Great Post","author":{"id":2}}');
     });
 
+    it("wraps under resource root if option set", function() {
+      Post.api.configure(function(config) {
+        config.wrapRoot = true;
+      });
+
+      post = Post.new(post);
+
+      expect(post.serialize()).toEqual(
+        '{"post":{"title":"My Great Post","id":1,"author":{"id":2}}}');
+    });
+
     it("serializes instances", function() {
       post = Post.new({id: 1, title: "My Great Post", author_id: 2});
 
