@@ -240,7 +240,65 @@ example:
   }
 ```
 
-### HTTP Configuration
+### API Configuration
+
+APIs are special snowflakes. ngActiveResource provides several helpers
+configuring your interactions with them to suit your needs. We're open to PRs
+for additional configuration options :)
+
+#### Base URL
+
+The Base URL of your API. For example, if your Posts model works with
+api.edmodo.com/posts, then the base URL is api.edmodo.com.
+
+As with all configuration options, you can set them globally:
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.baseURL = "http://api.edmodo.com";
+});
+```
+
+And override global settings on a per-model basis:
+
+```javascript
+Post.api.configure(function(config) {
+  config.baseURL = "http://posts-service.api.edmodo.com";
+});
+```
+#### Format
+
+Either set a fully-qualified mimetype, or use the default mimetype for a given
+mimetype suffix (json, xml, etc):
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.format = "application/json";
+
+  //or
+  config.format = "xml";
+});
+```
+
+#### Append Format (.json, .xml, etc)
+
+By default, ngActiveResource appends a format to URLs:
+
+http://your-api.com/posts.json
+http://your-api.com/posts/1.xml
+
+Your format is based on the mimetype's suffix (e.g. application/json or atom+xml)
+and is the name you most likely know the format by. 
+
+To turn this configuration off:
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.appendFormat = false;
+});
+```
+
+#### $http
 
 You'll probably also find yourself wanting to configure various `$http` options.
 If you've been working with Angular for a little while, you probably already
@@ -301,6 +359,63 @@ angular
     return authenticate;
 
   }]);
+```
+
+#### Pagination Attributes
+
+Configure the attribute to use for pagination requests. Defaults to "page":
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.paginationAttribute = "pg";
+});
+```
+
+And configure the per page attribute. Defaults to "per_page":
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.perPageAttribute = "per_pg";
+});
+```
+
+#### Deserialization/Serialization:
+
+Want to POST and PUT data wrapped under the name of the model?
+
+```javascript
+{
+  post: {
+    id: 1,
+    title: "My Great Post"
+  }
+}
+
+{
+  posts: [
+    {
+      id: 1,
+      title: "My Great Post"
+    }
+  ]
+}
+```
+
+Simple!
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.wrapRoot = true;
+});
+```
+
+Does your data return from the API wrapped as in the example above? You'll need
+to tell ngActiveResource to unwrap it when parsing:
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.unwrapRoot = true;
+});
 ```
 
 ## Computed Properties:
@@ -569,8 +684,8 @@ Post.deserialize('{"title": "My Great Title"}');
 >> {title: "My Great Title"}
 
 Post.api.configure(function(config) {
-    config.format = "xml";
-    config.unwrapRootElement = true;
+    config.format     = "xml";
+    config.unwrapRoot = true;
 });
 
 Post.deserialize('<post><title>My Great Title</title></post>');
