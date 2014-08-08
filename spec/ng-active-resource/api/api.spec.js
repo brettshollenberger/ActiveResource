@@ -174,7 +174,7 @@ describe('ARAPI', function() {
     });
 
     it("is overridden by model-specific configuration", function() {
-      ngActiveResource.API.configure(function(config) {
+      ngActiveResource.api.configure(function(config) {
         config.baseURL      = "https://api.edmodo.com/v1";
         config.format       = "text/xml";
         config.appendFormat = false;
