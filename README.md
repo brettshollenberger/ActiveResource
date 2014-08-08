@@ -159,15 +159,16 @@ angular
       Post.inherits(ngActiveResource.Base);
 
       Post.api.configure(function(config) {
-        config.baseURL  = "https://posty.api.edmodo.com";
-        config.format   = "xml";
+        config.baseURL   = "https://posty.api.edmodo.com";
+        config.nestedURL = "authors/:author_id";
+        config.format    = "xml";
 
         // URLs will be:
-        // GET    https://posty.api.edmodo.com/posts.xml
-        // GET    https://posty.api.edmodo.com/posts/1.xml
-        // POST   https://posty.api.edmodo.com/posts.xml
-        // PUT    https://posty.api.edmodo.com/posts/1.xml
-        // DELETE https://posty.api.edmodo.com/posts/1.xml
+        // GET    https://posty.api.edmodo.com/authors/1/posts.xml
+        // GET    https://posty.api.edmodo.com/authors/1/posts/1.xml
+        // POST   https://posty.api.edmodo.com/authors/1/posts.xml
+        // PUT    https://posty.api.edmodo.com/authors/1/posts/1.xml
+        // DELETE https://posty.api.edmodo.com/authors/1/posts/1.xml
         config.resource = "posts";
       });
 
@@ -267,6 +268,28 @@ Post.api.configure(function(config) {
   config.baseURL = "http://posts-service.api.edmodo.com";
 });
 ```
+
+#### Nested URL
+
+Sometimes your resources belong to parent resources. You can setup such a
+relationship specifically:
+
+```javascript
+ngActiveResource.api.configure(function(config) {
+  config.baseURL = "http://api.edmodo.com";
+});
+
+Post.api.configure(function(config) {
+  config.nestedURL = "authors/:author_id";
+});
+```
+
+Now your post URLs will be nested like:
+
+```
+http://api.edmodo.com/authors/:author_id/posts/:id
+```
+
 #### Format
 
 Either set a fully-qualified mimetype, or use the default mimetype for a given
