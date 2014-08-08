@@ -3,8 +3,10 @@ angular
   .factory('TShirt', ['ngActiveResource', function(ngActiveResource) {
 
     function TShirt(attributes) {
-      this.integer("id");
       this.number("price");
+      this.number("order_id");
+      this.boolean("available");
+      this.string("name");
 
       this.computedProperty('salePrice', function() {
         return this.price - (this.price * 0.2);
