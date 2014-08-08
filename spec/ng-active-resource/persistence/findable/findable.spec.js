@@ -24,6 +24,25 @@ describe("ARFindable", function() {
     expect(foundPost).toEqual(post);
   });
 
+  it("finds using a non-standard key", function() {
+    backend.expectGET("https://api.edmodo.com/posts/my-great-title.json")
+           .respond(200, {id: 1, title: "My Great Title"});
+
+    Post.api.configure(function(config) {
+      config.showURL = "posts/:title";
+
+      config.parameterizeTitle = function() {
+        return "my-great-title";
+      }
+    });
+
+    var post = Post.find({title: "My Great Title"});
+    backend.flush();
+
+    expect(post.id).toEqual(1);
+    expect(post.title).toEqual("My Great Title");
+  });
+
   it("queries the backend for instances otherwise", function() {
     var post = Post.find(1);
     backend.flush();
