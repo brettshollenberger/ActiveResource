@@ -1,16 +1,17 @@
-# ActiveResource for Angular.js
+# ngActiveResource: Modeling in Angular.js
 
-ActiveResource provides a Base class to make modelling with Angular easier. It
-provides associations, caching, API integration, validations, and Active Record
-pattern persistence methods.
+ngActiveResource provides the tools you need to make Angular modeling delightful.
+
+It provides Active Record pattern persistence methods, associations, events, dirty-checking, caching, validations, API integration, delegation, and serialization.
 
 * [Installation](#installation)
 * [Writing A Model](#writing-a-model)
 * [Declaring Your API](#declaring-your-api)
-* [Computed Properties](#computed-properties)
 * [Establishing Associations](#establish-associations)
 * [RESTful Interface](#methods)
+* [Eventable](#eventable)
 * [Custom Primary Keys](#custom-primary-keys)
+* [Computed Properties](#computed-properties)
 * [Dependent-Destroy](#dependent-destroy-associations)
 * [Serialization](#serialization)
 * [Defining Custom Mimetypes](#defining-custom-mimetypes)
@@ -63,15 +64,15 @@ angular
     .factory('Post', ['ngActiveResource', function(ngActiveResource) {
 
         Post.inherits(ngActiveResource.Base);
-                
+
         Post.hasMany('comments');
         Post.belongsTo('author');
-        
+
         Post.api.configure(function(config) {
             config.baseURL  = "http://api.edmodo.com";
             config.resource = "posts";
         });
-        
+
         Post.validates({
             title: { required: true },
             body:  { required: true }
@@ -418,25 +419,6 @@ ngActiveResource.api.configure(function(config) {
 });
 ```
 
-## Computed Properties:
-
-Following the syntax of Ember.js' computed properties, you can create properties
-that auto-magically update with or without Angular's two-way binding:
-
-```javascript
-function TShirt() {
-    this.number('price');
-    
-    this.computedProperty('salePrice', function() {
-        return this.price - (this.price * 0.2);
-    }, 'price');
-    
-    this.computedProperty('superSalePrice', function() {
-        return this.price - this.salePrice;
-    }, ['price', 'salePrice']);
-}
-```
-
 ## Establish Associations:
 
 A has many association can be setup by naming the field. If the field name is
@@ -640,6 +622,10 @@ var posts = Post.findAll().then(function() {
 });
 ```
 
+## Eventable
+
+
+
 ## Custom Primary Keys
 
 By default, models will assume a primary key field labeled `id`, but you can set
@@ -648,6 +634,25 @@ a custom one like so:
 ```javascript
 function Post(attributes) {}
 Post.primaryKey = '_id';
+```
+
+## Computed Properties:
+
+Following the syntax of Ember.js' computed properties, you can create properties
+that auto-magically update with or without Angular's two-way binding:
+
+```javascript
+function TShirt() {
+    this.number('price');
+    
+    this.computedProperty('salePrice', function() {
+        return this.price - (this.price * 0.2);
+    }, 'price');
+    
+    this.computedProperty('superSalePrice', function() {
+        return this.price - this.salePrice;
+    }, ['price', 'salePrice']);
+}
 ```
 
 ## Destroy Dependent Associations
