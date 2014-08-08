@@ -1,4 +1,4 @@
-xdescribe("AREventable", function() {
+describe("AREventable", function() {
   describe("Evented Models", function() {
     var person, instance, attributes;
     beforeEach(function() {
@@ -50,6 +50,43 @@ xdescribe("AREventable", function() {
 
     it("features an interface for adding events to instances", function() {
       expect(posts).toContain(post);
+    });
+
+    it("binds to delete events", function() {
+      var copy, clone;
+
+      backend.expectDELETE("https://api.edmodo.com/posts/3.json").respond(200);
+
+      post.before("delete", function() {
+        copy = post;
+      });
+
+      post.after("delete", function() {
+        clone = post;
+      });
+
+      post.$delete();
+      backend.flush();
+
+      expect(copy).toEqual(post);
+      expect(clone).toEqual(post);
+    });
+
+    it("binds to update events", function() {
+      var copy, clone;
+
+      post.before("update", function() {
+        copy = post;
+      });
+
+      post.after("update", function() {
+        clone = post;
+      });
+
+      post.update({});
+
+      expect(copy).toEqual(post);
+      expect(clone).toEqual(post);
     });
   });
 
