@@ -246,6 +246,11 @@ angular.module('ngActiveResource').factory('ARAPI', [
         baseURL = standardizeProtocol(baseURL);
         return baseURL;
       }
+      function standardizeEndpoint(endpoint) {
+        endpoint = prependSlash(endpoint);
+        endpoint = removeTrailingSlash(endpoint);
+        return endpoint;
+      }
       function isGETURL(action) {
         return _.include(api.GETURLs, action + 'URL');
       }
@@ -254,7 +259,7 @@ angular.module('ngActiveResource').factory('ARAPI', [
         if (_.isUndefined(endpoint)) {
           endpoint = api['set' + action.capitalize() + 'URL']();
         }
-        return standardizeBaseURL(api.baseURL) + endpoint;
+        return standardizeBaseURL(api.baseURL) + standardizeEndpoint(endpoint);
       }
       function parameterize(url, params, isGETURL) {
         if (klass.reflections) {
@@ -328,6 +333,12 @@ angular.module('ngActiveResource').factory('ARAPI', [
           return baseURL.slice(0, -1);
         }
         return baseURL;
+      }
+      function prependSlash(endpoint) {
+        if (endpoint.slice(0, 1) != '/') {
+          return '/' + endpoint;
+        }
+        return endpoint;
       }
     }
     return API;
