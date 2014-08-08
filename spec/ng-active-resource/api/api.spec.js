@@ -22,6 +22,24 @@ describe('ARAPI', function() {
       expect(config.params).toEqual({ id: 1 });
     });
 
+    it("chains in parent resource URLs", function() {
+      Post.api.configure(function(config) {
+        config.nestedURL         = "authors/:author_id";
+        config.showURL           = "posts/:title";
+        config.parameterizeTitle = function(title) {
+          return title.split(" ").join("-").toLowerCase().replace(/[\!\?]/g, '');
+        }
+      });
+
+      var config = {params: {id: 1, title: "My Great Post", author: {id: 2}}},
+          url    = Post.api.generateRequest("show", config);
+
+      expect(url)
+        .toEqual("https://api.edmodo.com/authors/2/posts/my-great-post.json");
+
+      expect(config.params).toEqual({ id: 1 });
+    });
+
     it("serializes associations to replace params", function() {
       Comment.api.configure(function(config) {
         config.baseURL = "http://api.edmodo.com/posts/:post_id";
