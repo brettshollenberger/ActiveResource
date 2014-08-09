@@ -634,7 +634,8 @@ angular.module('ngActiveResource').factory('ARCacheable', [
 //
 angular.module('ngActiveResource').factory('ARComputedProperty', [
   'AREventable.Array',
-  function (EventableArray) {
+  'ARMixin',
+  function (EventableArray, mixin) {
     function ComputedProperty() {
       // Build out computed property descriptors.
       //
