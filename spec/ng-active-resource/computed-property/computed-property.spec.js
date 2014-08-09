@@ -70,18 +70,23 @@ describe("Computed Properties", function() {
       ship2  = player.ships.new({id: 2});
     });
 
-    it("be computin", function() {
+    it("computes the properties of associations", function() {
       expect(player.lost).toEqual(false);
 
-//       ship1.state = "sunk";
-//       ship2.state = "sunk";
+      ship1.state = "sunk";
+      ship2.state = "sunk";
 
-      expect(player.ships).toContain(ship1);
+      expect(ship1.sunk).toBe(true);
+      expect(ship2.sunk).toBe(true);
 
-      // expect(ship1.sunk).toBe(true);
-      // expect(ship2.sunk).toBe(true);
+      expect(player.lost).toEqual(true);
 
-      // expect(player.lost).toEqual(true);
+      ship3 = player.ships.new({id: 3});
+
+      expect(player.lost).toEqual(false);
+
+      ship3.state = "sunk";
+      expect(player.lost).toEqual(true);
     });
   });
 });
