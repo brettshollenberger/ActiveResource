@@ -8,10 +8,12 @@ angular
 
     function Player(attributes) {
       this.computedProperty("lost", function() {
-        return !!(this.ships.length && this.ships.all(function(ship) {
+        if (this.ships.length == 0) { return false; }
+
+        return this.ships.all(function(ship) {
           return ship.sunk;
-        }));
-      }, "ships.state");
+        });
+      }, "ships.sunk");
     };
 
     return Player;
