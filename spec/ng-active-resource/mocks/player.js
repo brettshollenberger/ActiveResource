@@ -11,7 +11,7 @@ angular
         return !!(this.ships.length && this.ships.all(function(ship) {
           return ship.sunk;
         }));
-      }, "ships");
+      }, "ships.state");
     };
 
     return Player;
