@@ -5,14 +5,16 @@ angular.module('ngActiveResource', []).factory('ngActiveResource', [
   'ARDirty',
   'ARWatchable',
   'ARRefinable',
-  function (API, Base, Configurable, Dirty, Watchable, Refinable) {
+  'AREventable',
+  function (API, Base, Configurable, Dirty, Watchable, Refinable, Eventable) {
     ngActiveResource = {};
-    ngActiveResource.API = API;
+    ngActiveResource.api = API;
     ngActiveResource.Base = Base;
     ngActiveResource.Configurable = Configurable;
     ngActiveResource.Dirty = Dirty;
     ngActiveResource.Watchable = Watchable;
     ngActiveResource.Refinable = Refinable;
+    ngActiveResource.Eventable = Eventable;
     return ngActiveResource;
   }
 ]);
@@ -179,6 +181,7 @@ angular.module('ngActiveResource').factory('ARAPI', [
   function (querystring, Mime, serializeAssociations) {
     API.prototype.appendFormat = true;
     API.prototype.baseURL = 'http://api.override.com';
+    API.prototype.nestedURL = '';
     API.prototype.$http = {};
     API.prototype.format = 'application/json';
     API.prototype.paginationAttribute = 'page';
@@ -232,8 +235,14 @@ angular.module('ngActiveResource').factory('ARAPI', [
       api.resourceName = function () {
         return api.resource ? api.resource : api.klass.name;
       };
+      api.nestedURLComponent = function () {
+        if (api.nestedURL && api.nestedURL.length) {
+          return prependSlash(api.nestedURL);
+        }
+        return '';
+      };
       api.resourcesURL = function resourcesURL() {
-        return '/' + api.resourceName().underscore().pluralize();
+        return api.resourceName().underscore().pluralize();
       };
       api.resourceURL = function () {
         return api.resourcesURL() + '/:' + api.klass.primaryKey;
@@ -259,7 +268,7 @@ angular.module('ngActiveResource').factory('ARAPI', [
         if (_.isUndefined(endpoint)) {
           endpoint = api['set' + action.capitalize() + 'URL']();
         }
-        return standardizeBaseURL(api.baseURL) + standardizeEndpoint(endpoint);
+        return standardizeBaseURL(api.baseURL) + api.nestedURLComponent() + standardizeEndpoint(endpoint);
       }
       function parameterize(url, params, isGETURL) {
         if (klass.reflections) {
@@ -340,6 +349,12 @@ angular.module('ngActiveResource').factory('ARAPI', [
         }
         return endpoint;
       }
+      function appendSlash(endpoint) {
+        if (endpoint.slice(-1) != '/') {
+          return endpoint + '/';
+        }
+        return endpoint;
+      }
     }
     return API;
   }
@@ -362,11 +377,13 @@ angular.module('ngActiveResource').factory('ARAssociatable.CollectionAssociation
   'ARMixin',
   'ARFunctional.Collection',
   'ARDelegatable',
-  function (mixin, FunctionalCollection, Delegatable) {
+  'AREventable',
+  function (mixin, FunctionalCollection, Delegatable, Eventable) {
     function CollectionAssociation(owner, reflection) {
       var collection = mixin([], FunctionalCollection);
       privateVariable(collection, 'constructor', CollectionAssociation);
       collection.extend(Delegatable);
+      collection.extend(Eventable);
       collection.delegate([
         'name',
         'klass',
@@ -503,36 +520,68 @@ angular.module('ngActiveResource').factory('ARCacheable', [
     return Cache;
   }
 ]);
-// ComputedProperty(name, valueFn, dependents)
+// Computed Properties
 //
-// @param name       {string}         - The name of the property to be computed from other properties
+// Problem 1:
 //
-// @param valueFn    {func}           - The function used to compute the new property from the others
+// You are creating a CMS, and want to generate a "munged" article URL as the user enters the name
+// of the article. The munged title should update in real-time, with all the magic of Angular's
+// two-way data binding.
 //
-// @param dependents {string | array} - The name of the property or list of the properties that this 
-//                                      property depends upon.
+// Solution 1:
 //
-// Example:
+// Declare a computed property named "mungedTitle" with a dependency on "title":
 //
-//    function Tshirt(attributes) {
-//      this.number('price');
+//    function Article() {
+//      this.string("title");
 //
-//      this.computedProperty('salePrice', function() {
-//        return this.price - (this.price * 0.2);
-//      }, 'price');
+//      // "My Great Post" => "my-great-post"
+//      this.computedProperty("mungedTitle", function() {
+//        if (_.isUndefined(title)) { return ""; }
 //
-//      this.computedProperty('superSalePrice', function() {
-//        return this.price - this.salePrice;
-//      }, ['price', 'salePrice']);
+//        return this.title.split(" ").join("-").toLowerCase();
+//      }, "title");
 //    }
 //
-// The computed property function creates dynamically evaluated relationships between properties. In the example above,
-// a change to the price of an item updates its salePrice automatically, and an update to either price or salePrice automatically
-// updates the superSalePrice.
+// The magical part is that data-binding just works:
 //
-// Computed property actually allows you to create inter-dependent relationships:
+//    <input ng-model="article.title">
+//    {{article.mungedTitle}}
 //
-//    function Order() {
+// Problem 2:
+//
+// You want to generate the full name of a user from their first and last name.
+//
+// Solution 2:
+//
+// The computed value depends on two properties. So you define an array of dependencies; when either
+// changes, the computed value changes along with it:
+//
+//    function User() {
+//      this.string("firstName");
+//      this.string("lastName");
+//
+//      this.computedProperty("fullName", function() {
+//        return this.firstName + " " + this.lastName;
+//      }, ["firstName", "lastName"]);
+//    }
+//
+// Problem 3:
+//
+// You are creating an inventory calculator with special rules for computing the price of items and
+// the sale price of items.
+//
+// The rule for computing the price of an item is "the sale price plus $5." The rule for computing
+// the sale price is "the price minus $5."
+//
+// To help your in-store managers, you generate one or the other. If the user enters the price,
+// the sale price is computed. If they enter the sale price, the price is computed.
+//
+// Solution 3:
+//
+// You have two co-dependent computed properties:
+//
+//    function Item() {
 //      this.computedProperty('price', function() {
 //        return this.salePrice + 5;
 //      }, 'salePrice');
@@ -542,13 +591,55 @@ angular.module('ngActiveResource').factory('ARCacheable', [
 //      }, 'price');
 //    }
 //
-// In the example above, an update to price updates the salePrice, and an update to salePrice updates the price. Even with entire
-// models of complex inter-dependencies, these computed properties will update one another without causing an infinite cycle.
+// Problem 4:
 //
-// An example use-case is a spreadsheet application, where updating one field should cause related fields to update, and likewise
-// updating the related field should cause the same update.
-angular.module('ngActiveResource').factory('ARComputedProperty', [function () {
+// You are building a real-time Battleship game. A player has lost the game if all of their ships are
+// sunk. You want the "lost" property to update automatically when every ship for a player is sunk.
+//
+// Solution 4:
+//
+// Your computed property depends on the property "sunk" in an array of ships. You can declare a
+// computed property chain:
+//
+//    Ship.belongsTo("player");
+//
+//    function Ship() {
+//      this.string("state");
+//
+//      this.computedProperty("sunk", function() {
+//        return this.state == "sunk";
+//      }, "state");
+//    }
+//
+//    Player.hasMany("ships");
+//
+//    function Player() {
+//      this.computedProperty("lost", function() {
+//        return this.ships.all(function(ship) { return ship.sunk; });
+//      }, "ships.sunk");
+//    }
+//
+// NOTICE: In the example above, we say that the player's "lost" property relies on the ship's 
+// "sunk" property, not its "state" property.
+//
+// This is because "sunk" is itself a computed property. If Player listened for ship#state and
+// Ship listened for ship#state, then we would run the risk of having the Player callback fire
+// before the Ship callback.
+//
+// Since Player _actually_ relies on knowing whether or not the Ship has sunk, and not on whether
+// or not its state has changed in general, we must ensure that the ship#sunk dependency has finished
+// evaluating before the player#lost callback fires.
+//
+// These differences are subtle, but necessary to understand for event-driven programming.
+//
+angular.module('ngActiveResource').factory('ARComputedProperty', [
+  'AREventable.Array',
+  function (EventableArray) {
     function ComputedProperty() {
+      // Build out computed property descriptors.
+      //
+      // Computed properties rely on Eventable objects, and must wait until the object has finished
+      // initializing in order to build successfully.
       this.__computedProperty = function (name, valueFn, dependents) {
         if (!this.computedProperties) {
           privateVariable(this, 'computedProperties', []);
@@ -559,6 +650,7 @@ angular.module('ngActiveResource').factory('ARComputedProperty', [function () {
           dependents
         ]);
       };
+      // Build each computed property
       this.__buildComputedProperties = function () {
         _.each(this.computedProperties, function (computedProperty) {
           buildComputedProperty.apply(this, computedProperty);
@@ -569,7 +661,7 @@ angular.module('ngActiveResource').factory('ARComputedProperty', [function () {
       function buildComputedProperty(name, valueFn, dependents) {
         var instance = this;
         var data = this.constructor.constructing.attributes;
-        instance.justSet = [];
+        privateVariable(instance, 'justSet', []);
         if (!dependents) {
           dependents = [];
         }
@@ -577,34 +669,81 @@ angular.module('ngActiveResource').factory('ARComputedProperty', [function () {
           dependents = [dependents];
         }
         _.each(dependents, function (dependent) {
-          var local, originalVal = instance[dependent], previousSetter = instance.__lookupSetter__(dependent);
-          Object.defineProperty(instance, dependent, {
-            enumerable: true,
-            configurable: true,
-            get: function () {
-              return local;
-            },
-            set: function (val) {
-              local = val;
-              instance.emit(dependent + ':set');
-              return local;
-            }
-          });
-          // Allow inter-dependencies between properties without creating
-          // an infinite loop between them.
-          instance.on(dependent + ':set', function () {
+          var local, dependencyChain = dependent.split('.'), hasChildDependencies = dependencyChain.length > 1, dependent = hasChildDependencies ? dependencyChain[0] : dependent, childDependencies = dependencyChain.slice(1), originalVal = instance[dependent];
+          watchProperty(instance, dependent);
+          instance.on(dependent + ':set', setVal);
+          function setVal() {
+            // Allow inter-dependencies between properties without creating an infinite loop between them.
             instance.justSet.push(dependent);
             if (!_.include(instance.justSet, name)) {
               instance[name] = valueFn.apply(instance);
             }
             instance.justSet = [];
-          });
+          }
           instance[dependent] = originalVal;
+          // Watch child dependencies for changes, calling setVal as appropriate
+          if (childDependencies.length) {
+            _.each(childDependencies, function (childDependency) {
+              watch(instance[dependent], childDependency);
+              instance.on(childDependency + ':set', setVal);
+            });
+          }
+          function watch(obj, propName) {
+            if (_.isUndefined(obj)) {
+              return;
+            }
+            if (_.isFunction(obj.push)) {
+              watchArray(obj, propName);
+              return;
+            }
+            if (propName) {
+              if (propName.constructor.name == 'String') {
+                watchProperty(obj, propName);
+                return;
+              }
+            }
+            for (var i in obj) {
+              watchProperty(obj, i);
+            }
+          }
+          function watchArray(array, propName) {
+            array = mixin(array, EventableArray);
+            array.on('push', function (newElements) {
+              _.each(newElements, function (newElement) {
+                watch(newElement, propName);
+              });
+            });
+          }
+          function watchProperty(obj, property) {
+            var setter = obj.__lookupSetter__(property);
+            var currentVal = obj[property];
+            (function (obj, property) {
+              var val = currentVal;
+              if (_.isUndefined(setter)) {
+                setter = function (value) {
+                  return val = value;
+                };
+              }
+              Object.defineProperty(obj, property, {
+                enumerable: true,
+                configurable: true,
+                get: function () {
+                  return val;
+                },
+                set: function (value) {
+                  val = setter(value);
+                  instance.emit(property + ':set');
+                  return val;
+                }
+              });
+            }(obj, property));
+          }
         });
       }
     }
     return ComputedProperty;
-  }]);
+  }
+]);
 // Configurable
 //
 // Configuration objects should be easy to change, leaving little room for client error.
@@ -998,6 +1137,24 @@ angular.module('ngActiveResource').factory('AREventable', [
     }
     ;
     return Eventable;
+  }
+]);
+angular.module('ngActiveResource').factory('AREventable.Array', [
+  'AREventable',
+  function (Eventable) {
+    function EventableArray(array) {
+      this.extend(Eventable, { private: true });
+      this.push = function () {
+        this.emit('push', arguments);
+        return Array.prototype.push.apply(this, arguments);
+      };
+      this.pop = function () {
+        var popped = Array.prototype.pop.apply(this);
+        this.emit('pop', popped);
+        return popped;
+      };
+    }
+    return EventableArray;
   }
 ]);
 angular.module('ngActiveResource').factory('ARForeignKeyify', [function () {
@@ -2130,9 +2287,9 @@ angular.module('ngActiveResource').factory('ARCreatable', [
         attributes = attributes || {};
         this.emit('new:called', attributes);
         var instance = new this(attributes);
+        this.emit('new:beginning', instance, attributes);
         instance.extend(Eventable, { private: true });
         instance.buildComputedProperties();
-        this.emit('new:beginning', instance, attributes);
         this.emit('new:complete', instance);
         return instance;
       };
@@ -4056,6 +4213,47 @@ angular.module('ngActiveResource').factory('ARValidatable.validators', [
       return validators[validatorName];
     };
     return validators;
+  }
+]);
+angular.module('ngActiveResource').factory('ARWatchable.Watch', [
+  'AREventable.Array',
+  function (EventableArray) {
+    function watch(obj, propName, fn) {
+      if (_.isUndefined(obj)) {
+        return;
+      }
+      if (fn === void 0 && typeof propName == 'function') {
+        fn = propName;
+        propName = undefined;
+      }
+      if (_.isFunction(obj.push)) {
+        watchArray(obj, propName, fn);
+        return;
+      }
+      if (propName) {
+        if (propName.constructor.name == 'String') {
+          watchProperty(obj, propName, fn);
+          return;
+        }
+      }
+      for (var i in obj) {
+        watchProperty(obj, i, fn);
+      }
+    }
+    function watchArray(array, propName, fn) {
+      array = mixin(array, EventableArray);
+      array.on('push', function (newElements) {
+        _.each(newElements, function (newElement) {
+          watch(newElement, propName, fn);
+          fn(newElement, array);
+        });
+      });  //       array.on('pop', function(removedElement) {
+           //         fn(removedElement, array);
+           //       });
+    }
+    function watchProperty(obj, propName, fn) {
+    }
+    return watch;
   }
 ]);
 angular.module('ngActiveResource').factory('ARWatchable', [
