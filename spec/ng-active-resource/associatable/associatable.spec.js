@@ -148,4 +148,31 @@ describe("ARAssociatable", function() {
       expect(comment.post.comments).toContain(comment);
     });
   });
+
+  describe("Edge cases", function() {
+
+    beforeEach(function() {
+      backend.whenGET("https://api.edmodo.com/schools.json?district_id=1&page=1")
+             .respond(200, [{id: 17900, name: "Edmodo High", district_id: 1}]);
+
+      backend.whenGET("https://api.edmodo.com/districts/1.json")
+             .respond(200, {id: 1, name: "Edmodo District"});
+
+      backend.whenGET("https://api.edmodo.com/users.json?district_id=1&page=1")
+             .respond(200, [{id: 250, name: "Bert Wellington", district: {id: 1},
+                            school: {id: 17900}}]);
+    });
+
+    it("initializes multiple associations on the same instance", function() {
+      var district = District.find(1);
+      backend.flush();
+      var schools  = School.where({district_id: 1});
+      backend.flush();
+      var members  = Member.where({district_id: 1});
+      backend.flush();
+
+      expect(members.first().school).toEqual(schools.first());
+      expect(members.first().district).toEqual(district);
+    });
+  });
 });
