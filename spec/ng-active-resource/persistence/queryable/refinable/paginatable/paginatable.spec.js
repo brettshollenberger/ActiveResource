@@ -65,7 +65,26 @@ ddescribe("ARPaginatable", function() {
       expect(posts.next_page_exists()).toBe(true);
     });
 
-    iit("returns to page one like an idiot", function() {
+    iit("preloads before it receives pagination information", function() { 
+      console.log(posts.pluck("id"));
+      backend.flush();
+      posts.next_page();
+      backend.flush();
+
+      console.log(posts.pluck("id"));
+
+      posts.previous_page();
+      $timeout.flush();
+      console.log(posts.pluck("id"));
+
+      posts.next_page();
+      backend.flush();
+
+      console.log(posts.pluck("id"));
+      expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 3, per_page: 5});
+    });
+
+    it("returns to page one like an idiot", function() {
       expect(posts.pluck("id")).toEqual([1, 2, 3, 4, 5]);
       backend.flush();
       posts.next_page();
