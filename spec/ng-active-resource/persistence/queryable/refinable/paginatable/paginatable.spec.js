@@ -161,14 +161,17 @@ ddescribe("ARPaginatable", function() {
     });
 
     it("knows when a next page exists", function() {
+      expect(posts.current_page()).toEqual(3);
       expect(posts.next_page_exists()).toBe(true);
       backend.flush();
       posts.next_page();
+      expect(posts.current_page()).toEqual(4);
       expect(posts.next_page_exists()).toBe(true);
       backend.flush();
       expect(posts.next_page_exists()).toBe(true);
       posts.next_page();
       $timeout.flush();
+      expect(posts.current_page()).toEqual(5);
       expect(posts.next_page_exists()).toBe(false);
     });
 
