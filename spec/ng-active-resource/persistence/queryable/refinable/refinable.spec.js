@@ -74,7 +74,7 @@ describe("ARRefinable", function() {
     expect(posts.last().id).toEqual(2);
   });
 
-  iit("recognizes queries of different types as fundamentally the same", function() {
+  it("recognizes strings/numbers as fundamentally the same query", function() {
     var posts = new ngActiveResource.Refinable(Post);
     posts.where({author_id: 1});
     backend.flush();

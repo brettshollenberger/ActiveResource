@@ -1,4 +1,4 @@
-ddescribe("ARPaginatable", function() {
+describe("ARPaginatable", function() {
     var posts;
     beforeEach(function() {
       backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5")
