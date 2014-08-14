@@ -1,5 +1,4 @@
-describe("ARPaginatable", function() {
-  describe("Starting in the middle of a list", function() {
+ddescribe("ARPaginatable", function() {
     var posts;
     beforeEach(function() {
       backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5")
@@ -39,7 +38,37 @@ describe("ARPaginatable", function() {
 
         backend.whenGET("https://api.edmodo.com/posts.json?author_id=2&page=3&per_page=1")
           .respond(200, [{id: 202}]);
+  });
 
+  describe("Starting at the beginning of a list", function() {
+    beforeEach(function() {
+      posts = Post.where({author_id: 1, page: 1, per_page: 5});
+
+      spyOn($http, "get").andCallThrough();
+      backend.flush();
+
+      posts.paginate();
+    });
+
+    it("starts off on the requested page", function() {
+      expect(posts.first().id).toEqual(1);
+      expect(posts.last().id).toEqual(5);
+    });
+
+    it("cannot move to the previous page after preloading", function() {
+      backend.flush();
+      expect(posts.previous_page_exists()).toBe(false);
+    });
+
+    iit("can move to the next page", function() {
+      backend.flush();
+      expect(posts.next_page_exists()).toBe(true);
+    });
+
+  });
+
+  describe("Starting in the middle of a list", function() {
+    beforeEach(function() {
       posts = Post.where({author_id: 1, page: 3, per_page: 5});
 
       spyOn($http, "get").andCallThrough();
