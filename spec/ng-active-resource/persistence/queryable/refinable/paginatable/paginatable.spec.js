@@ -64,6 +64,38 @@ describe("ARPaginatable", function() {
       backend.flush();
       expect(posts.next_page_exists()).toBe(true);
     });
+
+    describe("Edge cases", function() {
+      it("does not preload pages unless they are directly next or previous", function() { 
+        backend.flush();
+        posts.next_page();
+        backend.flush();
+
+        posts.previous_page();
+        $timeout.flush();
+
+        posts.next_page();
+        expect(function() { backend.flush(); }).toThrow("No pending request to flush !");
+
+        expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 3, per_page: 5});
+      });
+
+      it("does not return to a previously cached page instead of the correct page", function() {
+        expect(posts.pluck("id")).toEqual([1, 2, 3, 4, 5]);
+        backend.flush();
+        posts.next_page();
+        expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+        backend.flush();
+        posts.next_page();
+
+        expect(posts.pluck("id")).toEqual([11, 12, 13, 14, 15]);
+
+        posts.previous_page();
+        $timeout.flush();
+
+        expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+      });
+    });
   });
 
   describe("Starting in the middle of a list", function() {
