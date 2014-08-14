@@ -1,4 +1,4 @@
-ddescribe("ARPaginatable", function() {
+describe("ARPaginatable", function() {
     var posts;
     beforeEach(function() {
       backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5")
@@ -65,34 +65,36 @@ ddescribe("ARPaginatable", function() {
       expect(posts.next_page_exists()).toBe(true);
     });
 
-    it("preloads before it receives pagination information", function() { 
-      backend.flush();
-      posts.next_page();
-      backend.flush();
+    describe("Edge cases", function() {
+      it("does not preload pages unless they are directly next or previous", function() { 
+        backend.flush();
+        posts.next_page();
+        backend.flush();
 
-      posts.previous_page();
-      $timeout.flush();
+        posts.previous_page();
+        $timeout.flush();
 
-      posts.next_page();
-      expect(function() { backend.flush(); }).toThrow("No pending request to flush !");
+        posts.next_page();
+        expect(function() { backend.flush(); }).toThrow("No pending request to flush !");
 
-      expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 3, per_page: 5});
-    });
+        expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 3, per_page: 5});
+      });
 
-    xit("returns to page one like an idiot", function() {
-      expect(posts.pluck("id")).toEqual([1, 2, 3, 4, 5]);
-      backend.flush();
-      posts.next_page();
-      expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
-      backend.flush();
-      posts.next_page();
+      it("does not return to a previously cached page instead of the correct page", function() {
+        expect(posts.pluck("id")).toEqual([1, 2, 3, 4, 5]);
+        backend.flush();
+        posts.next_page();
+        expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+        backend.flush();
+        posts.next_page();
 
-      expect(posts.pluck("id")).toEqual([11, 12, 13, 14, 15]);
+        expect(posts.pluck("id")).toEqual([11, 12, 13, 14, 15]);
 
-      posts.previous_page();
-      $timeout.flush();
+        posts.previous_page();
+        $timeout.flush();
 
-      expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+        expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+      });
     });
   });
 
