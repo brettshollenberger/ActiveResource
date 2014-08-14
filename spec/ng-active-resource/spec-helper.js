@@ -1,4 +1,4 @@
-var ngActiveResource, Mocks, Player, Ship, Post, Author, Comment, Person, Hat, Collection, TShirt, API, backend, $http, $timeout, Delegatable, mixin, Reflections, foreignkeyify, dropHasMany, serializeAssociations;
+var ngActiveResource, Mocks, Player, Ship, Post, Author, Comment, Person, Hat, Collection, TShirt, Member, District, School, API, backend, $http, $timeout, Delegatable, mixin, Reflections, foreignkeyify, dropHasMany, serializeAssociations;
 
 beforeEach(module('ngActiveResource'));
 beforeEach(module('Mocks'));
@@ -16,6 +16,9 @@ beforeEach(inject(function(_ngActiveResource_, _Mocks_, _ARMime_, _ARAPI_, $http
     Hat                   = Mocks.Hat;
     Collection            = Mocks.Collection;
     TShirt                = Mocks.TShirt;
+    Member                = Mocks.Member;
+    District              = Mocks.District;
+    School                = Mocks.School;
     Mime                  = _ARMime_;
     API                   = _ARAPI_;
     backend               = $httpBackend;
