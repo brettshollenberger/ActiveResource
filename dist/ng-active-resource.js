@@ -2497,7 +2497,7 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
   'ARFunctional.Collection',
   function (mixin, FunctionalCollection) {
     function Paginatable() {
-      var options = {}, paginationHypermedia = {}, __headers;
+      var options = {}, paginationHypermedia = {}, preloaded = [], __headers;
       this.paginate = function (paginationOptions) {
         options = _.defaults({}, paginationOptions, { preload: true });
         this.parseHypermedia();
@@ -2544,8 +2544,15 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
       this.paginationHypermedia = function () {
         return paginationHypermedia;
       };
+      // Only preload the next or previous page--don't get crazy with the preloading
+      this.shouldPreload = function (hypermedia) {
+        return Math.abs(hypermedia.params.page - this.current_page()) == 1 && !this.preloaded(hypermedia);
+      };
+      this.preloaded = function (hypermedia) {
+        return !!this.queries.find(hypermedia.params);
+      };
       this.preload = function (hypermedia) {
-        if (!options.preload || !_.isObject(hypermedia) || !hypermedia.params) {
+        if (!options.preload || !_.isObject(hypermedia) || !hypermedia.params || !this.shouldPreload(hypermedia)) {
           this.defer();
           return this;
         }
