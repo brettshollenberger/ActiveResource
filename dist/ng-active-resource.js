@@ -3287,7 +3287,6 @@ angular.module('ngActiveResource').factory('ARReflections.BelongsToReflection', 
       var reflection = this;
       AbstractReflection.call(reflection, name, options);
       reflection.initialize = function (instance, attributes) {
-        mixin(attributes, InitializeAttributes);
         this.initializeByReference(instance, attributes);
         this.initializeFromForeignKey(instance, attributes);
         this.initializeInverse(instance, attributes);
@@ -3300,7 +3299,7 @@ angular.module('ngActiveResource').factory('ARReflections.BelongsToReflection', 
       };
       reflection.initializeFromForeignKey = function (instance, attributes) {
         if (this.containsForeignKey(attributes)) {
-          this.initializeFor(instance, this.klass.cached.find(attributes.foreignKey()));
+          this.initializeFor(instance, this.klass.cached.find(attributes[reflection.foreignKey]));
           if (!_.isUndefined(instance[reflection.name])) {
             delete instance[reflection.foreignKey];
           }
@@ -3313,11 +3312,6 @@ angular.module('ngActiveResource').factory('ARReflections.BelongsToReflection', 
           }
         }
       };
-      function InitializeAttributes() {
-        privateVariable(this, 'foreignKey', function () {
-          return this[reflection.foreignKey];
-        });
-      }
     }
     return BelongsToReflection;
   }
