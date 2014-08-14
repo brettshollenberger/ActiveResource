@@ -1,4 +1,4 @@
-describe("ARPaginatable", function() {
+ddescribe("ARPaginatable", function() {
     var posts;
     beforeEach(function() {
       backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5")
@@ -63,6 +63,21 @@ describe("ARPaginatable", function() {
     it("can move to the next page", function() {
       backend.flush();
       expect(posts.next_page_exists()).toBe(true);
+    });
+
+    iit("returns to page one like an idiot", function() {
+      expect(posts.pluck("id")).toEqual([1, 2, 3, 4, 5]);
+      backend.flush();
+      posts.next_page();
+      expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+      backend.flush();
+      posts.next_page();
+
+      expect(posts.pluck("id")).toEqual([11, 12, 13, 14, 15]);
+
+      posts.previous_page();
+      backend.flush();
+      expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
     });
   });
 
