@@ -2526,7 +2526,7 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
         });
       };
       this.current_page = function () {
-        return this.mostRecentCall[this.paginationAttribute()];
+        return Number(this.mostRecentCall[this.paginationAttribute()]);
       };
       this.next_page_exists = function () {
         return this.page_exists('next');
@@ -2539,7 +2539,7 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
         if (_.isUndefined(pageNumber)) {
           return false;
         }
-        return nextOrPrevious == 'next' ? this.current_page() <= pageNumber : this.current_page() >= pageNumber;
+        return nextOrPrevious == 'next' ? this.current_page() < pageNumber : this.current_page() > pageNumber;
       };
       this.paginationHypermedia = function () {
         return paginationHypermedia;
@@ -2644,7 +2644,7 @@ angular.module('ngActiveResource').factory('ARQueryCache', [
       privateVariable(this, 'createCacheKey', function (query) {
         var keys = _.keys(query).sort();
         return JSON.stringify(_.inject(keys, function (cacheKey, key) {
-          cacheKey[key] = query[key];
+          cacheKey[key] = String(query[key]);
           return cacheKey;
         }, {}));
       });
