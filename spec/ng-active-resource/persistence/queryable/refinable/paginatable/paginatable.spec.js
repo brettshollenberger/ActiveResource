@@ -95,6 +95,27 @@ describe("ARPaginatable", function() {
 
         expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
       });
+
+      it("does not claim next page doesn't when no more hypermedia is unloaded", function() {
+        expect(posts.pluck("id")).toEqual([1, 2, 3, 4, 5]);
+        backend.flush();
+        posts.next_page();
+        expect(posts.pluck("id")).toEqual([6, 7, 8, 9, 10]);
+        backend.flush();
+        posts.next_page();
+        expect(posts.pluck("id")).toEqual([11, 12, 13, 14, 15]);
+        backend.flush();
+        posts.next_page();
+        expect(posts.pluck("id")).toEqual([16, 17, 18, 19, 20]);
+        backend.flush();
+        posts.next_page();
+        expect(posts.pluck("id")).toEqual([21, 22, 23, 24, 25]);
+        posts.previous_page();
+        expect(posts.pluck("id")).toEqual([16, 17, 18, 19, 20]);
+
+        $timeout.flush();
+        expect(posts.next_page_exists()).toEqual(true);
+      });
     });
   });
 
