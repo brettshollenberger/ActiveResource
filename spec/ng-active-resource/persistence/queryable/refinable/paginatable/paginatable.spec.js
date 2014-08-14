@@ -60,11 +60,10 @@ ddescribe("ARPaginatable", function() {
       expect(posts.previous_page_exists()).toBe(false);
     });
 
-    iit("can move to the next page", function() {
+    it("can move to the next page", function() {
       backend.flush();
       expect(posts.next_page_exists()).toBe(true);
     });
-
   });
 
   describe("Starting in the middle of a list", function() {
@@ -174,14 +173,16 @@ ddescribe("ARPaginatable", function() {
     });
 
     it("knows when a previous page exists", function() {
+      expect(posts.current_page()).toEqual(3);
       expect(posts.previous_page_exists()).toBe(true);
       backend.flush();
       posts.previous_page();
-      expect(posts.previous_page_exists()).toBe(true);
       backend.flush();
+      expect(posts.current_page()).toEqual(2);
       expect(posts.previous_page_exists()).toBe(true);
       posts.previous_page();
       $timeout.flush();
+      expect(posts.current_page()).toEqual(1);
       expect(posts.previous_page_exists()).toBe(false);
     });
 
