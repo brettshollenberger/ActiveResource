@@ -65,4 +65,36 @@ ddescribe("ARPaginatable", function() {
       expect(posts.next_page_exists()).toBe(true);
     });
   });
+
+  describe("Starting in the middle of a list", function() {
+    beforeEach(function() {
+      posts = Post.where({author_id: 1, page: 3, per_page: 5});
+
+      spyOn($http, "get").andCallThrough();
+      backend.flush();
+
+      posts.paginate();
+    });
+
+    it("starts off on the requested page", function() {
+      expect(posts.first().id).toEqual(11);
+      expect(posts.last().id).toEqual(15);
+    });
+
+    it("moves to the next page", function() {
+      backend.flush();
+      posts.next_page();
+
+      expect(posts.first().id).toEqual(16);
+      expect(posts.last().id).toEqual(20);
+    });
+
+    it("moves to the previous page", function() {
+      backend.flush();
+      posts.previous_page();
+
+      expect(posts.first().id).toEqual(6);
+      expect(posts.last().id).toEqual(10);
+    });
+  });
 });
