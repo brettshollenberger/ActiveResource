@@ -1502,6 +1502,18 @@ angular.module('ngActiveResource').factory('ARLinkHeaders', [
     return LinkHeaders;
   }
 ]);
+angular.module('ngActiveResource').factory('ARParams', [function () {
+    return {
+      standardize: function (params) {
+        _.each(params, function (value, key) {
+          if (_.isUndefined(value) || value == '') {
+            delete params[key];
+          }
+        });
+        return params;
+      }
+    };
+  }]);
 // Unified handler for remote responses
 //
 // Override default behavior via Class.whereHandler, Class.createHandler, etc.
@@ -2694,7 +2706,8 @@ angular.module('ngActiveResource').factory('ARRefinable', [
   'ARQueryCache',
   'ARPaginatable',
   'AREventable',
-  function ($http, mixin, FunctionalCollection, httpConfig, Promiseable, HTTPResponseHandler, QueryCache, Paginatable, Eventable) {
+  'ARParams',
+  function ($http, mixin, FunctionalCollection, httpConfig, Promiseable, HTTPResponseHandler, QueryCache, Paginatable, Eventable, Params) {
     function Refinable(klass) {
       var refinable = mixin([], FunctionalCollection);
       refinable.klass = klass;
@@ -2704,8 +2717,7 @@ angular.module('ngActiveResource').factory('ARRefinable', [
       klass.watchedCollections.push(refinable);
       privateVariable(refinable, 'queries', new QueryCache());
       refinable.where = function (params, config) {
-        var params = standardizeParams(params);
-        config = _.merge({ params: params }, config, httpConfig(klass), _.defaults);
+        var params = Params.standardize(standardizeParams(params)), config = _.merge({ params: params }, config, httpConfig(klass), _.defaults);
         if (!config.preload) {
           refinable.mostRecentCall = config.params || {};
         }
@@ -2789,7 +2801,6 @@ angular.module('ngActiveResource').factory('ARRefinable', [
         defaults[refinable.paginationAttribute()] = 1;
         params = _.isObject(params) ? params : {};
         if (nonPaginationParamsChanged(params)) {
-          // refinable.resetPagination(params);
           return _.merge(params, { page: 1 }, refinable.mostRecentCall, defaults, _.defaults);
         } else {
           return _.merge(params, refinable.mostRecentCall, defaults, _.defaults);
