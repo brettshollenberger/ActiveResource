@@ -96,5 +96,68 @@ ddescribe("ARPaginatable", function() {
       expect(posts.first().id).toEqual(6);
       expect(posts.last().id).toEqual(10);
     });
+
+    it("moves to an exact page", function() {
+      backend.flush();
+      posts.page(1);
+      backend.flush();
+
+      expect(posts.first().id).toEqual(1);
+      expect(posts.last().id).toEqual(5);
+    });
+
+    it("stores hypermedia", function() {
+      expect(posts.paginationHypermedia().next.params).toEqual({
+        author_id: 1,
+        page: 4,
+        per_page: 5
+      });
+
+      expect(posts.paginationHypermedia().previous.params).toEqual({
+        author_id: 1,
+        page: 2,
+        per_page: 5
+      });
+    });
+
+    it("preloads hypermedia when it moves to the next page", function() {
+      backend.flush();
+      posts.next_page();
+      backend.flush();
+
+      expect(posts.first().id).toEqual(16);
+      expect(posts.last().id).toEqual(20);
+
+      expect(posts.paginationHypermedia().next.params).toEqual({
+        author_id: 1,
+        page: 5,
+        per_page: 5
+      });
+
+      posts.next_page();
+
+      expect(posts.first().id).toEqual(21);
+      expect(posts.last().id).toEqual(25);
+    });
+
+    it("preloads hypermedia when it moves to the previous page", function() {
+      backend.flush();
+      posts.previous_page();
+      backend.flush();
+
+      expect(posts.first().id).toEqual(6);
+      expect(posts.last().id).toEqual(10);
+
+      expect(posts.paginationHypermedia().previous.params).toEqual({
+        author_id: 1,
+        page: 1,
+        per_page: 5
+      });
+
+      posts.previous_page();
+
+      expect(posts.first().id).toEqual(1);
+      expect(posts.last().id).toEqual(5);
+    });
   });
 });
