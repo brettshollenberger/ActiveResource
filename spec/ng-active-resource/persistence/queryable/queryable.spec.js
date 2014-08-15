@@ -54,11 +54,23 @@ describe("ARQueryable", function() {
     });
   });
 
-  it("caches queries", function() {
+  it("caches query objects", function() {
     var posts = Post.where({author_id: 1, page: 2, per_page: 5});
     backend.flush();
 
     expect(posts.queries.find({author_id: 1, page: 2, per_page: 5}).objects.pluck("id"))
       .toEqual(posts.pluck("id"));
+  });
+
+  it("caches query responses", function() {
+    var posts = Post.where({author_id: 1, page: 2, per_page: 5});
+    backend.flush();
+
+    expect(posts.queries.find({author_id: 1, page: 2, per_page: 5}).headers.link.next.params)
+      .toEqual({
+        author_id: 1,
+        page: 3,
+        per_page: 5
+      });
   });
 });
