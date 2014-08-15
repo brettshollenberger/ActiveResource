@@ -13,6 +13,8 @@ describe("ARQueryable", function() {
         {'Link': 
          '<https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5>; rel="previous", <https://api.edmodo.com/posts.json?author_id=1&page=3&per_page=5; rel="next"'});
 
+    spyOn($http, "get").andCallThrough();
+
   });
 
   it("finds multiple instances via query", function() {
@@ -72,5 +74,12 @@ describe("ARQueryable", function() {
         page: 3,
         per_page: 5
       });
+  });
+
+  it("does not query with empty params", function() {
+    var posts = Post.where({author_id: 1, query: ""});
+    backend.flush();
+
+    expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 1});
   });
 });
