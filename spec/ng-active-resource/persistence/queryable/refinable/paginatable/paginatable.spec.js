@@ -260,5 +260,12 @@ describe("ARPaginatable", function() {
       posts.previous_page();
       expect(posts.first().id).toEqual(201);
     });
+
+    it("appropriately resets x_page_exists data when other parameters change", function() {
+      posts.where({author_id: 2, per_page: 1});
+      backend.flush();
+
+      expect(posts.next_page_exists()).toBe(true);
+    });
   });
 });
