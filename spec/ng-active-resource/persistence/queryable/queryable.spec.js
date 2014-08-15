@@ -7,6 +7,12 @@ describe("ARQueryable", function() {
     backend.whenGET("https://api.edmodo.com/posts.json?page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
+
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=2&per_page=5")
+      .respond(200, [{id: 6}, {id: 7}, {id: 8}, {id: 9}, {id: 10}],
+        {'Link': 
+         '<https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5>; rel="previous", <https://api.edmodo.com/posts.json?author_id=1&page=3&per_page=5; rel="next"'});
+
   });
 
   it("finds multiple instances via query", function() {
@@ -46,5 +52,13 @@ describe("ARQueryable", function() {
     posts.each(function(post) {
       expect(post.author).toEqual(author);
     });
+  });
+
+  it("caches queries", function() {
+    var posts = Post.where({author_id: 1, page: 2, per_page: 5});
+    backend.flush();
+
+    expect(posts.queries.find({author_id: 1, page: 2, per_page: 5}).objects.pluck("id"))
+      .toEqual(posts.pluck("id"));
   });
 });

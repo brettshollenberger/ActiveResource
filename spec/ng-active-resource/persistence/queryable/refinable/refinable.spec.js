@@ -36,8 +36,8 @@ describe("ARRefinable", function() {
     posts.where({author_id: 1});
     backend.flush();
 
-    expect(posts.queries.find({author_id: 1, page: 1}).first()).toEqual(posts.first());
-    expect(posts.queries.find({author_id: 1, page: 1}).last()).toEqual(posts.last());
+    expect(posts.queries.find({author_id: 1, page: 1}).objects.first()).toEqual(posts.first());
+    expect(posts.queries.find({author_id: 1, page: 1}).objects.last()).toEqual(posts.last());
   });
 
   it("stashes the most recent call, automatically adding pagination", function() {
@@ -58,8 +58,8 @@ describe("ARRefinable", function() {
     expect(posts.first().id).toEqual(3);
     expect(posts.last().id).toEqual(4);
 
-    expect(posts.queries.find({author_id: 1, page: 2}).first()).toEqual(posts.first());
-    expect(posts.queries.find({author_id: 1, page: 2}).last()).toEqual(posts.last());
+    expect(posts.queries.find({author_id: 1, page: 2}).objects.first()).toEqual(posts.first());
+    expect(posts.queries.find({author_id: 1, page: 2}).objects.last()).toEqual(posts.last());
   });
 
   it("reverts to cached queries when possible", function() {
