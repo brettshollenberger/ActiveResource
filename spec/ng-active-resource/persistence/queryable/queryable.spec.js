@@ -4,6 +4,10 @@ describe("ARQueryable", function() {
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
 
+    backend.whenGET("https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5")
+      .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
+                {id: 2, title: "Joan of Shark", author_id: 1}], {});
+
     backend.whenGET("https://api.edmodo.com/posts.json?page=1")
       .respond(200, [{id: 1, title: "My Great Post", author_id: 1},
                 {id: 2, title: "Joan of Shark", author_id: 1}], {});
@@ -81,5 +85,20 @@ describe("ARQueryable", function() {
     backend.flush();
 
     expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 1});
+  });
+
+  it("has appendQueryString option", function() {
+    var posts = Post.where({author_id: 1});
+    backend.flush();
+
+    posts.where({page: 2, per_page: 5}, {appendQueryString: true});
+    backend.flush();
+
+    expect($location.search()).toEqual({page: '2', per_page: '5', author_id: '1'});
+
+    posts.where({page: 1}, {appendQueryString: true});
+    backend.flush();
+
+    expect($location.search()).toEqual({page: '1', per_page: '5', author_id: '1'});
   });
 });
