@@ -2605,7 +2605,10 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
         return this.hypermedia_exists(nextOrPrevious) || this.pagePreloaded(nextOrPrevious);
       });
       privateVariable(this, 'hypermedia_exists', function (nextOrPrevious) {
-        var pageNumber = _.isObject(this.paginationHypermedia()[nextOrPrevious]) ? this.paginationHypermedia()[nextOrPrevious].params[this.paginationAttribute()] : undefined;
+        var pageNumber;
+        if (_.isObject(this.paginationHypermedia()[nextOrPrevious])) {
+          pageNumber = this.paginationHypermedia()[nextOrPrevious].params[this.paginationAttribute()];
+        }
         if (_.isUndefined(pageNumber)) {
           return false;
         }
@@ -2618,11 +2621,9 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
         return this.preloaded({ params: params });
       });
       privateVariable(this, 'paginationHypermedia', function () {
-        if (mostRecentCall != this.mostRecentCall) {
-          mostRecentCall = this.mostRecentCall;
-          paginationHypermedia = this.queries.find(mostRecentCall).headers.link;
+        if (this.queries.find(this.mostRecentCall)) {
+          return this.queries.find(this.mostRecentCall).headers.link || {};
         }
-        return paginationHypermedia;
       });
       privateVariable(this, 'preloadNextAndPreviousPagination', function () {
         var collection = this;
