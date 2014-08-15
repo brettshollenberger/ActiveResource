@@ -159,5 +159,35 @@ ddescribe("ARPaginatable", function() {
       expect(posts.first().id).toEqual(1);
       expect(posts.last().id).toEqual(5);
     });
+
+    it("knows when a next page exists", function() {
+      expect(posts.current_page()).toEqual(3);
+      expect(posts.next_page_exists()).toBe(true);
+      backend.flush();
+      posts.next_page();
+      expect(posts.current_page()).toEqual(4);
+      expect(posts.next_page_exists()).toBe(true);
+      backend.flush();
+      expect(posts.next_page_exists()).toBe(true);
+      posts.next_page();
+      $timeout.flush();
+      expect(posts.current_page()).toEqual(5);
+      expect(posts.next_page_exists()).toBe(false);
+    });
+
+    it("knows when a previous page exists", function() {
+      expect(posts.current_page()).toEqual(3);
+      expect(posts.previous_page_exists()).toBe(true);
+      backend.flush();
+      posts.previous_page();
+      backend.flush();
+      expect(posts.current_page()).toEqual(2);
+      expect(posts.previous_page_exists()).toBe(true);
+      posts.previous_page();
+      $timeout.flush();
+      expect(posts.current_page()).toEqual(1);
+      expect(posts.previous_page_exists()).toBe(false);
+    });
+
   });
 });
