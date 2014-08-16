@@ -2520,7 +2520,11 @@ angular.module('ngActiveResource').factory('ARQueryable', [
   'ARHTTPResponseHandler',
   'ARHTTPConfig',
   'ARRefinable',
-  function ($http, mixin, FunctionalCollection, Paginatable, Promiseable, HTTPResponseHandler, httpConfig, Refinable) {
+  'ARStateParams',
+  function ($http, mixin, FunctionalCollection, Paginatable, Promiseable, HTTPResponseHandler, httpConfig, Refinable, StateParams) {
+    Queryable.extended = function (klass) {
+      klass.extend(StateParams);
+    };
     function Queryable() {
       this.findAll = function (config) {
         return this.where({}, config);
@@ -2720,10 +2724,7 @@ angular.module('ngActiveResource').factory('ARRefinable', [
       privateVariable(refinable, 'queries', new QueryCache());
       refinable.where = function (params, config) {
         var params = Params.standardize(standardizeParams(params)), config = _.merge({ params: params }, config, httpConfig(klass), _.defaults);
-        if (config.appendQueryString) {
-          $location.url($location.path() + '?' + querystring.stringify(params));
-          delete config.appendQueryString;
-        }
+        klass.stateParams.appendQueryString(params, config);
         if (!config.preload) {
           refinable.mostRecentCall = config.params || {};
         }
@@ -2817,6 +2818,49 @@ angular.module('ngActiveResource').factory('ARRefinable', [
     return Refinable;
   }
 ]);
+angular.module('ngActiveResource').factory('ARStateParams', [function () {
+    StateParams.prototype.blacklist = [];
+    StateParams.prototype.whitelist = [];
+    StateParams.extended = function (klass) {
+      klass.stateParams = new StateParams(klass);
+    };
+    function StateParams() {
+      var stateParams = this;
+      privateVariable(this, 'appendQueryString', function (params, config) {
+        if (config.appendQueryString) {
+          $location.url($location.path() + '?' + querystring.stringify(this.appendableParams(params)));
+          delete config.appendQueryString;
+        }
+      });
+      privateVariable(this, 'appendableParams', function (params) {
+        var paramsClone = _.cloneDeep(params);
+        paramsClone = this.whitelistParams(paramsClone);
+        paramsClone = this.blacklistParams(paramsClone);
+        return paramsClone;
+      });
+      privateVariable(this, 'whitelistParams', function (params) {
+        if (stateParams.whitelist.length) {
+          return _.transform(params, function (result, value, key) {
+            if (_.include(stateParams.whitelist, key)) {
+              result[key] = value;
+            }
+            return result;
+          }, {});
+        } else {
+          return params;
+        }
+      });
+      privateVariable(this, 'blacklistParams', function (params) {
+        return _.transform(params, function (result, value, key) {
+          if (!_.include(stateParams.blacklist, key)) {
+            result[key] = value;
+          }
+          return result;
+        }, {});
+      });
+    }
+    return StateParams;
+  }]);
 angular.module('ngActiveResource').factory('ARSaveable', [
   '$http',
   'ARHTTPConfig',
