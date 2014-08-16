@@ -2711,9 +2711,7 @@ angular.module('ngActiveResource').factory('ARRefinable', [
   'ARPaginatable',
   'AREventable',
   'ARParams',
-  '$location',
-  'ARQueryString',
-  function ($http, mixin, FunctionalCollection, httpConfig, Promiseable, HTTPResponseHandler, QueryCache, Paginatable, Eventable, Params, $location, querystring) {
+  function ($http, mixin, FunctionalCollection, httpConfig, Promiseable, HTTPResponseHandler, QueryCache, Paginatable, Eventable, Params) {
     function Refinable(klass) {
       var refinable = mixin([], FunctionalCollection);
       refinable.klass = klass;
@@ -2818,7 +2816,10 @@ angular.module('ngActiveResource').factory('ARRefinable', [
     return Refinable;
   }
 ]);
-angular.module('ngActiveResource').factory('ARStateParams', [function () {
+angular.module('ngActiveResource').factory('ARStateParams', [
+  '$location',
+  'ARQueryString',
+  function ($location, querystring) {
     StateParams.prototype.blacklist = [];
     StateParams.prototype.whitelist = [];
     StateParams.extended = function (klass) {
@@ -2860,7 +2861,8 @@ angular.module('ngActiveResource').factory('ARStateParams', [function () {
       });
     }
     return StateParams;
-  }]);
+  }
+]);
 angular.module('ngActiveResource').factory('ARSaveable', [
   '$http',
   'ARHTTPConfig',
