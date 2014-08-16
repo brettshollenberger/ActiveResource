@@ -106,8 +106,17 @@ describe("ARQueryable", function() {
       expect($location.search()).toEqual({page: '1', per_page: '5', author_id: '1'});
     });
 
-    iit("blacklists params, and will not append them to the query string", function() {
+    it("blacklists params, and will not append them to the query string", function() {
       Post.stateParams.blacklist = ["api_token"];
+
+      var posts = Post.where({author_id: 1, api_token: "my_api_token"}, {appendQueryString: true});
+      backend.flush();
+
+      expect($location.search()).toEqual({author_id: '1', page: '1'});
+    });
+
+    it("whitelists params, and will only append them to the query string", function() { 
+      Post.stateParams.whitelist = ["author_id", "page"];
 
       var posts = Post.where({author_id: 1, api_token: "my_api_token"}, {appendQueryString: true});
       backend.flush();
