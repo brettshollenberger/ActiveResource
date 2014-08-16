@@ -17,6 +17,9 @@ describe("ARQueryable", function() {
         {'Link': 
          '<https://api.edmodo.com/posts.json?author_id=1&page=1&per_page=5>; rel="previous", <https://api.edmodo.com/posts.json?author_id=1&page=3&per_page=5; rel="next"'});
 
+    backend.whenGET("https://api.edmodo.com/posts.json?api_token=my_api_token&author_id=1&page=1")
+           .respond(200, [{id: 1, author_id: 1}]);
+
     spyOn($http, "get").andCallThrough();
 
   });
@@ -87,18 +90,29 @@ describe("ARQueryable", function() {
     expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 1});
   });
 
-  it("has appendQueryString option", function() {
-    var posts = Post.where({author_id: 1});
-    backend.flush();
+  describe("#appendQueryString", function() {
+    it("appends params to the query string without changing location", function() {
+      var posts = Post.where({author_id: 1});
+      backend.flush();
 
-    posts.where({page: 2, per_page: 5}, {appendQueryString: true});
-    backend.flush();
+      posts.where({page: 2, per_page: 5}, {appendQueryString: true});
+      backend.flush();
 
-    expect($location.search()).toEqual({page: '2', per_page: '5', author_id: '1'});
+      expect($location.search()).toEqual({page: '2', per_page: '5', author_id: '1'});
 
-    posts.where({page: 1}, {appendQueryString: true});
-    backend.flush();
+      posts.where({page: 1}, {appendQueryString: true});
+      backend.flush();
 
-    expect($location.search()).toEqual({page: '1', per_page: '5', author_id: '1'});
+      expect($location.search()).toEqual({page: '1', per_page: '5', author_id: '1'});
+    });
+
+    iit("blacklists params, and will not append them to the query string", function() {
+      Post.stateParams.blacklist = ["api_token"];
+
+      var posts = Post.where({author_id: 1, api_token: "my_api_token"}, {appendQueryString: true});
+      backend.flush();
+
+      expect($location.search()).toEqual({author_id: '1', page: '1'});
+    });
   });
 });
