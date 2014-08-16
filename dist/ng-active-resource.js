@@ -2707,7 +2707,9 @@ angular.module('ngActiveResource').factory('ARRefinable', [
   'ARPaginatable',
   'AREventable',
   'ARParams',
-  function ($http, mixin, FunctionalCollection, httpConfig, Promiseable, HTTPResponseHandler, QueryCache, Paginatable, Eventable, Params) {
+  '$location',
+  'ARQueryString',
+  function ($http, mixin, FunctionalCollection, httpConfig, Promiseable, HTTPResponseHandler, QueryCache, Paginatable, Eventable, Params, $location, querystring) {
     function Refinable(klass) {
       var refinable = mixin([], FunctionalCollection);
       refinable.klass = klass;
@@ -2718,6 +2720,10 @@ angular.module('ngActiveResource').factory('ARRefinable', [
       privateVariable(refinable, 'queries', new QueryCache());
       refinable.where = function (params, config) {
         var params = Params.standardize(standardizeParams(params)), config = _.merge({ params: params }, config, httpConfig(klass), _.defaults);
+        if (config.appendQueryString) {
+          $location.url($location.path() + '?' + querystring.stringify(params));
+          delete config.appendQueryString;
+        }
         if (!config.preload) {
           refinable.mostRecentCall = config.params || {};
         }
