@@ -60,9 +60,24 @@ describe("ARDirty", function() {
 
     expect(post.titleChanged()).toEqual(false);
 
-    post.title = "";
+    post.title = "cool thing";
 
     expect(post.titleChanged()).toEqual(true);
+  });
+
+  it("knows the previous values of specific fields", function() {
+    post.$save();
+    backend.flush();
+
+    expect(post.titleWas()).toEqual(undefined);
+
+    post.title = "Whatever";
+    post.$save();
+    backend.flush();
+
+    post.title = "New Thing";
+
+    expect(post.titleWas()).toEqual("Whatever");
   });
 
   it("is not dirty if numbers and strings are compared", function() {
