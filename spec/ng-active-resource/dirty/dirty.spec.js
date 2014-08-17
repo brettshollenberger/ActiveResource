@@ -65,6 +65,14 @@ describe("ARDirty", function() {
     expect(post.titleChanged()).toEqual(true);
   });
 
+  it("names changed/was functions in snake/camelcase dependent on the field", function() {
+    post.$save();
+    backend.flush();
+
+    expect(post.author_id_changed()).toEqual(false);
+    expect(post.author_id_was()).toEqual(undefined);
+  });
+
   it("knows the previous values of specific fields", function() {
     post.$save();
     backend.flush();
