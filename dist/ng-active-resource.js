@@ -986,11 +986,13 @@ angular.module('ngActiveResource').factory('ARDirty', [
         }, this).compact().value();
       });
       privateVariable(this, 'buildDirtyAttributes', function () {
-        _.each(_.keys(this), function (propertyName) {
-          privateVariable(this, propertyName + 'Changed', function () {
+        var propertyNames = _.keys(this), currentAttributes = _.cloneDeep(this), klass = this.constructor, reflections = klass.reflections || {}, snakeOrCamel = snakeOrCamelcase(propertyNames);
+        _.each(propertyNames, function (propertyName) {
+          var changedName = caseify(propertyName, 'changed', snakeOrCamel), wasName = caseify(propertyName, 'was', snakeOrCamel);
+          privateVariable(this, changedName, function () {
             return attributeChanged(propertyName, serializeAssociations(_.cloneDeep(this), this.constructor.reflections), this.lastSave);
           });
-          privateVariable(this, propertyName + 'Was', function () {
+          privateVariable(this, wasName, function () {
             return this.lastSave[propertyName];
           });
         }, this);
@@ -1031,6 +1033,35 @@ angular.module('ngActiveResource').factory('ARDirty', [
         str[key] = obj[key];
         return str;
       }, {}));
+    }
+    function snakeOrCamelcase(propertyNames) {
+      if (_.all(propertyNames, function (propertyName) {
+          return isSnake(propertyName);
+        })) {
+        return 'snake';
+      }
+      if (!_.any(propertyNames, function (propertyName) {
+          return containsUnderscore(propertyName);
+        })) {
+        return 'camel';
+      }
+    }
+    function isSnake(attributeName) {
+      return containsUnderscore(attributeName) || attributeName == attributeName.toLowerCase();
+    }
+    function containsUnderscore(attributeName) {
+      return !!attributeName.match(/\_/);
+    }
+    function propertyIsSnakeOrCamel(propertyName, snakeOrCamel) {
+      if (snakeOrCamel) {
+        return snakeOrCamel;
+      } else {
+        return containsUnderscore(propertyName) ? 'snake' : 'camel';
+      }
+    }
+    function caseify(propertyName, toAppend, snakeOrCamel) {
+      var thisSnakeOrCamel = propertyIsSnakeOrCamel(propertyName, snakeOrCamel);
+      return thisSnakeOrCamel == 'snake' ? propertyName + '_' + toAppend.toLowerCase() : propertyName + toAppend.capitalize();
     }
     return Dirty;
   }
