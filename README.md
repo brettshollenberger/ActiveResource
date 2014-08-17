@@ -8,6 +8,10 @@ It provides Active Record pattern persistence methods, associations, events, dir
 
 We have an active [Wiki](https://github.com/brettshollenberger/the-abstractions-are-leaking/wiki) with all the details you need to become an ngActiveResource master!
 
+## Legal Mumbo Jumbo
+
+TL;DR do whatever you want
+
 The MIT License (MIT)
 
 Copyright (c) 2013-2014 Brett Shollenberger
