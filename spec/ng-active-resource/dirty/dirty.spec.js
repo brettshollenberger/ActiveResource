@@ -54,6 +54,17 @@ describe("ARDirty", function() {
     expect(post.dirty()).toBe(true);
   });
 
+  it("knows whether specific fields have changed", function() {
+    post.$save();
+    backend.flush();
+
+    expect(post.titleChanged()).toEqual(false);
+
+    post.title = "";
+
+    expect(post.titleChanged()).toEqual(true);
+  });
+
   it("is not dirty if numbers and strings are compared", function() {
     post.$save();
     backend.flush();
