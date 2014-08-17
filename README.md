@@ -1,4 +1,4 @@
-# ngActiveResource: Modeling in Angular.js
+# [ngActiveResource: Modeling in Angular.js](https://github.com/brettshollenberger/the-abstractions-are-leaking/wiki)
 
 ngActiveResource provides the tools you need to make Angular modeling delightful.
 
