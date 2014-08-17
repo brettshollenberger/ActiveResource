@@ -4,7 +4,7 @@ ngActiveResource provides the tools you need to make Angular modeling delightful
 
 It provides Active Record pattern persistence methods, associations, events, dirty-checking, caching, validations, API integration, delegation, and serialization.
 
-We have an active (Wiki)[https://github.com/brettshollenberger/the-abstractions-are-leaking/wiki] with all the details you need to become an ngActiveResource master!
+We have an active [Wiki](https://github.com/brettshollenberger/the-abstractions-are-leaking/wiki) with all the details you need to become an ngActiveResource master!
 
 The MIT License (MIT)
 
