@@ -959,6 +959,8 @@ angular.module('ngActiveResource').factory('ARDirty', [
     Dirty.extended = function (klass) {
       klass.after('new', function (instance) {
         mixin(instance, Dirty);
+        instance.buildDirtyAttributes();
+        delete instance.buildDirtyAttributes;
       });
       klass.after('save', function (instance) {
         privateVariable(instance, 'lastSave', _.cloneDeep(instance));
@@ -982,6 +984,16 @@ angular.module('ngActiveResource').factory('ARDirty', [
             return attributeName;
           }
         }, this).compact().value();
+      });
+      privateVariable(this, 'buildDirtyAttributes', function () {
+        _.each(_.keys(this), function (propertyName) {
+          privateVariable(this, propertyName + 'Changed', function () {
+            return attributeChanged(propertyName, serializeAssociations(_.cloneDeep(this), this.constructor.reflections), this.lastSave);
+          });
+          privateVariable(this, propertyName + 'Was', function () {
+            return this.lastSave[propertyName];
+          });
+        }, this);
       });
     }
     function DirtyOptions(options) {
@@ -1606,7 +1618,7 @@ angular.module('ngActiveResource').factory('ARMime.JSON', [
   'ARMime',
   function (Mime) {
     var json = new Mime.Format({ name: 'json' }), applicationJson = new Mime.Type({ name: 'application/json' });
-    Mime.formats['json'].parsers.push(function (json) {
+    json.parsers.push(function (json) {
       if (_.isObject(json)) {
         return json;
       }
@@ -1614,8 +1626,8 @@ angular.module('ngActiveResource').factory('ARMime.JSON', [
         return JSON.parse(json);
       }
     });
-    Mime.formats['json'].formatters.push(JSON.stringify);
-    return JSON;
+    json.formatters.push(JSON.stringify);
+    return json;
   }
 ]);
 (function () {
