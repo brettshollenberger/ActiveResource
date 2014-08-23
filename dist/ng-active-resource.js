@@ -2641,11 +2641,11 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
           collection.preloadNextAndPreviousPagination();
         });
       };
-      this.next_page = function () {
-        this.flip_page('next');
+      this.next_page = function (config) {
+        this.flip_page('next', config);
       };
-      this.previous_page = function () {
-        this.flip_page('previous');
+      this.previous_page = function (config) {
+        this.flip_page('previous', config);
       };
       this.next_page_exists = function () {
         return this.page_exists('next');
@@ -2653,10 +2653,10 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
       this.previous_page_exists = function () {
         return this.page_exists('previous');
       };
-      privateVariable(this, 'flip_page', function (nextOrPrevious) {
-        var params = {}, collection = this;
+      privateVariable(this, 'flip_page', function (nextOrPrevious, config) {
+        var params = {}, config = config || {}, collection = this;
         params[this.paginationAttribute()] = nextOrPrevious == 'next' ? this.current_page() + 1 : this.current_page() - 1;
-        return this.where(params).then(function () {
+        return this.where(params, config).then(function () {
           collection.preloadPagination(collection.paginationHypermedia()[nextOrPrevious]);
         });
       });
