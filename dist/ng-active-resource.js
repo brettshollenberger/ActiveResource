@@ -2665,7 +2665,7 @@ angular.module('ngActiveResource').factory('ARPaginatable', [
       });
       privateVariable(this, 'hypermedia_exists', function (nextOrPrevious) {
         var pageNumber;
-        if (_.isObject(this.paginationHypermedia()[nextOrPrevious])) {
+        if (_.isObject(this.paginationHypermedia() && this.paginationHypermedia()[nextOrPrevious])) {
           pageNumber = this.paginationHypermedia()[nextOrPrevious].params[this.paginationAttribute()];
         }
         if (_.isUndefined(pageNumber)) {
