@@ -65,6 +65,14 @@ describe("ARPaginatable", function() {
       expect(posts.next_page_exists()).toBe(true);
     });
 
+    it("passes on options to where", function() {
+      backend.flush();
+      posts.next_page({appendQueryString: true});
+      backend.flush();
+
+      expect($location.search()).toEqual({page: '2', per_page: '5', author_id: '1'});
+    });
+
     describe("Edge cases", function() {
       it("does not preload pages unless they are directly next or previous", function() { 
         backend.flush();
