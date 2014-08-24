@@ -2862,7 +2862,8 @@ angular.module('ngActiveResource').factory('ARRefinable', [
 angular.module('ngActiveResource').factory('ARStateParams', [
   '$location',
   'ARQueryString',
-  function ($location, querystring) {
+  'ARRouter',
+  function ($location, querystring, router) {
     StateParams.prototype.blacklist = [];
     StateParams.prototype.whitelist = [];
     StateParams.extended = function (klass) {
@@ -2870,9 +2871,18 @@ angular.module('ngActiveResource').factory('ARStateParams', [
     };
     function StateParams() {
       var stateParams = this;
+      privateVariable(this, 'parameterizeUrl', function (params) {
+        var route = bestRoute($location.path(), params), querystringParams = _.cloneDeep(params);
+        route = route.replace(/\:(\w+)/, function (urlParam) {
+          var paramName = urlParam.replace(':', ''), paramVal = params[paramName];
+          delete querystringParams[urlParam.slice(1)];
+          return paramVal;
+        });
+        return route + '?' + querystring.stringify(this.appendableParams(querystringParams));
+      });
       privateVariable(this, 'appendQueryString', function (params, config) {
         if (config.appendQueryString) {
-          $location.url($location.path() + '?' + querystring.stringify(this.appendableParams(params)));
+          $location.url(this.parameterizeUrl(params));
           delete config.appendQueryString;
         }
       });
@@ -2902,6 +2912,27 @@ angular.module('ngActiveResource').factory('ARStateParams', [
           return result;
         }, {});
       });
+    }
+    function bestRoute(currentRoute, queryData) {
+      var possibleRoutes = _.keys(router.routes);
+      var bestRoute = _.chain(possibleRoutes).compact().map(function (route) {
+          return [
+            route,
+            _.reject(route.split('/'), function (routePiece) {
+              // keep only the url params
+              return routePiece[0] != ':';
+            })
+          ];
+        }).reject(function (group) {
+          // keep only the routes that contain url params that are currently a part
+          // of the queryData object
+          return !_.include(_.chain(queryData).keys().map(function (k) {
+            return ':' + k;
+          }).value(), _.first(group[1]));
+        }).map(function (group) {
+          return group[0];
+        }).value();
+      return bestRoute.length > 0 ? _.first(bestRoute) : currentRoute;
     }
     return StateParams;
   }
@@ -3579,6 +3610,27 @@ angular.module('ngActiveResource').factory('ARReflections', [
       mixin(this, FunctionalCollection);
     }
     return Reflections;
+  }
+]);
+angular.module('ngActiveResource').factory('$routeWrapper', [
+  '$route',
+  function ($route) {
+    function NgRouteWrapper() {
+      return $route;
+    }
+    return new NgRouteWrapper();
+  }
+]);
+angular.module('ngActiveResource').factory('ARRouter', [
+  '$location',
+  '$injector',
+  function ($location, $injector) {
+    Router.prototype.router = '$route';
+    function Router() {
+      this.routes = $injector.get(this.router + 'Wrapper').routes;
+      return this;
+    }
+    return new Router();
   }
 ]);
 angular.module('ngActiveResource').factory('ARDeserializable', [
