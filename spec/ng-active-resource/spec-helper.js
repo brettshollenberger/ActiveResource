@@ -1,4 +1,4 @@
-var ngActiveResource, Mocks, Player, Ship, Post, Author, Comment, Person, Hat, Collection, TShirt, Member, District, School, API, backend, $http, $timeout, Delegatable, mixin, Reflections, foreignkeyify, dropHasMany, serializeAssociations, params, $location, $route;
+var ngActiveResource, Mocks, Player, Ship, Post, Author, Comment, Person, Hat, Collection, TShirt, Member, District, School, API, backend, $http, $timeout, Delegatable, mixin, Reflections, foreignkeyify, dropHasMany, serializeAssociations, params, $location, $route, $routeParams;
 
 beforeEach(module('ngRoute'));
 
@@ -28,7 +28,7 @@ beforeEach(module('ngActiveResource'));
 beforeEach(module('Mocks'));
 beforeEach(inject(function(_ngActiveResource_, _Mocks_, _ARMime_, _ARAPI_, $httpBackend, _$http_, 
   _$timeout_, _ARDelegatable_, _ARMixin_, _ARReflections_, _Foreignkeyify_, _DropHasMany_,
-  _ARSerializeAssociations_, _ARParams_, _$location_, _$route_) {
+  _ARSerializeAssociations_, _ARParams_, _$location_, _$route_, _$routeParams_) {
     ngActiveResource      = _ngActiveResource_;
     Mocks                 = _Mocks_;
     Player                = Mocks.Player;
@@ -57,6 +57,7 @@ beforeEach(inject(function(_ngActiveResource_, _Mocks_, _ARMime_, _ARAPI_, $http
     params                = _ARParams_;
     $location             = _$location_;
     $route                = _$route_;
+    $routeParams          = _$routeParams_;
 
     API.configure(function(config) {
       config.baseURL = "https://api.edmodo.com";
