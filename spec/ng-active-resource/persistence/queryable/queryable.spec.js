@@ -90,7 +90,7 @@ describe("ARQueryable", function() {
     expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 1});
   });
 
-  describe("#appendQueryString", function() {
+  ddescribe("#appendQueryString", function() {
     it("appends params to the query string without changing location", function() {
       var posts = Post.where({author_id: 1});
       backend.flush();
@@ -122,6 +122,11 @@ describe("ARQueryable", function() {
       backend.flush();
 
       expect($location.search()).toEqual({author_id: '1', page: '1'});
+    });
+
+    it("wraps $location service with helper to choose routeProvider", function() {
+      var posts = Post.where({author_id: 1});
+      console.log(_.keys($route.routes));
     });
   });
 });
