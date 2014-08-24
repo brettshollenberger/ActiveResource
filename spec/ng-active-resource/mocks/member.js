@@ -12,11 +12,15 @@ angular
     });
 
     Member.parse = function(json) {
-      json.school_id   = json.school.id;
-      json.district_id = json.district.id;
+      if (json.school) {
+        json.school_id   = json.school.id;
+        delete json.school;
+      }
 
-      delete json.school;
-      delete json.district;
+      if (json.district) {
+        json.district_id = json.district.id;
+        delete json.district;
+      }
 
       return json;
     }
