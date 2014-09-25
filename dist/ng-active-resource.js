@@ -1558,11 +1558,6 @@ angular.module('ngActiveResource').factory('ARParams', [function () {
     };
   }]);
 // Unified handler for remote responses
-//
-// Override default behavior via Class.whereHandler, Class.createHandler, etc.
-//
-// Custom handlers should return true if the response is not an error, and false
-// if the response is an error.
 angular.module('ngActiveResource').factory('ARHTTPResponseHandler', [
   'ARStrictRequire',
   'ARHeaders',
@@ -3392,10 +3387,19 @@ angular.module('ngActiveResource').factory('ARReflections.AbstractReflection', [
         return options.primaryKey || this.klass.primaryKey;
       };
       this.inverse = function () {
-        return this.klass.reflections.where({ klass: this.inverseKlass() }).first();
+        return this.klass.reflections.where({
+          klass: this.inverseKlass(),
+          macro: this.inverseMacro()
+        }).first();
       };
       this.inverseKlass = function () {
         return options.inverseOf;
+      };
+      this.inverseMacro = function () {
+        return {
+          'belongsTo': 'hasMany',
+          'hasMany': 'belongsTo'
+        }[this.macro];
       };
       this.containsAssociation = function (object) {
         return !_.isUndefined(object[this.name]);
