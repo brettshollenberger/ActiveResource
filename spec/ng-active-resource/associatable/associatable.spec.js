@@ -175,4 +175,28 @@ describe("ARAssociatable", function() {
       expect(members.first().district).toEqual(district);
     });
   });
+
+  describe("Self joins", function() {
+    var directory, file;
+    beforeEach(function() {
+      backend.whenGET("https://api.edmodo.com/files/1.json")
+              .respond(200, {id: 1, name: "Top Level Dir"});
+
+      backend.whenGET("https://api.edmodo.com/files.json?page=1&parent_id=1")
+              .respond(200, [{id: 2, name: "File", parent_id: 1}]);
+
+      directory = File.find(1).then(function() {
+        directory.files.findAll().then(function() {
+          file = directory.files.first();
+        });
+      });
+
+      backend.flush();
+    });
+
+    it("successfully self joins", function() {
+      expect(directory.files).toContain(file);
+      expect(file.parent).toEqual(directory);
+    });
+  });
 });

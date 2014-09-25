@@ -1,8 +1,8 @@
 angular
   .module('Mocks', ['ngActiveResource'])
-  .factory('Mocks', ['Player', 'Ship', 'Post', 'Comment', 'Person', 'TShirt', 'ARHat', 'ARCollection', 'Author', 'Member', 'District', 'School',
+  .factory('Mocks', ['Player', 'Ship', 'Post', 'Comment', 'Person', 'TShirt', 'ARHat', 'ARCollection', 'Author', 'Member', 'District', 'School', 'File',
   function(Player, Ship, Post, Comment, Person, TShirt, Hat, Collection, Author, 
-  Member, District, School) {
+  Member, District, School, File) {
     return {
       Player: Player,
       Ship: Ship,
@@ -15,6 +15,7 @@ angular
       TShirt: TShirt,
       Member: Member,
       District: District,
-      School: School
+      School: School,
+      File: File
     };
   }]);
