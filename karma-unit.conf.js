@@ -18,6 +18,7 @@ module.exports = function(config) {
       // DEPENDENCIES  
       // ------------------------------
       'bower_components/angular/angular.js',
+      'bower_components/angular-route/angular-route.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/active-support/active-support.js',
       'bower_components/lodash/dist/lodash.js',

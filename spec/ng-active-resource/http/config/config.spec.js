@@ -20,6 +20,8 @@ describe("ARHTTPConfig", function() {
 
     spyOn($http, "get").andCallThrough();
     spyOn($http, "post").andCallThrough();
+
+    backend.flush();
   });
 
   it("adds default params to requests", function() {

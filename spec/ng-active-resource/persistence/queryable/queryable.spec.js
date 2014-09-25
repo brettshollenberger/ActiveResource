@@ -20,8 +20,18 @@ describe("ARQueryable", function() {
     backend.whenGET("https://api.edmodo.com/posts.json?api_token=my_api_token&author_id=1&page=1")
            .respond(200, [{id: 1, author_id: 1}]);
 
+    backend.whenGET("https://api.edmodo.com/users.json?district_id=1&page=1")
+           .respond(200, [{id: 1, district_id: 1}]);
+
+    backend.whenGET("https://api.edmodo.com/users.json?page=1&school_id=1")
+           .respond(200, [{id: 1, school_id: 1}]);
+
+    backend.whenGET("https://api.edmodo.com/users.json?page=1&query=thing&school_id=1")
+           .respond(200, [{id: 1, school_id: 1}]);
+
     spyOn($http, "get").andCallThrough();
 
+    backend.flush();
   });
 
   it("finds multiple instances via query", function() {
@@ -88,6 +98,9 @@ describe("ARQueryable", function() {
     backend.flush();
 
     expect($http.get.mostRecentCall.args[1].params).toEqual({author_id: 1, page: 1});
+
+    var posts = Post.where({author_id: 1, query: ""});
+    backend.flush();
   });
 
   describe("#appendQueryString", function() {
@@ -122,6 +135,29 @@ describe("ARQueryable", function() {
       backend.flush();
 
       expect($location.search()).toEqual({author_id: '1', page: '1'});
+    });
+
+    it("wraps $location service with helper to choose routeProvider", function() {
+      var members = Member.where({district_id: 1}, {appendQueryString: true});
+      backend.flush();
+
+      expect($location.$$url).toEqual("/districts/1/members/?page=1");
+      expect($location.search()).toEqual({page: "1"});
+      expect($routeParams).toEqual({page: "1", district_id: '1'});
+
+      var members = Member.where({school_id: 1}, {appendQueryString: true});
+      backend.flush();
+
+      expect($location.$$url).toEqual("/schools/1/members/?page=1");
+      expect($location.search()).toEqual({page: "1"});
+      expect($routeParams).toEqual({page: "1", school_id: '1'});
+
+      members.where({query: "thing"}, {appendQueryString: true});
+      backend.flush();
+
+      expect($location.$$url).toEqual("/schools/1/members/?query=thing&page=1");
+      expect($location.search()).toEqual({query: "thing", page: "1"});
+      expect($routeParams).toEqual({page: "1", query: "thing", school_id: "1"});
     });
   });
 });
