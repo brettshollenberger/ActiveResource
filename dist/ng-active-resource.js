@@ -965,6 +965,14 @@ angular.module('ngActiveResource').factory('ARDirty', [
       klass.after('save', function (instance) {
         privateVariable(instance, 'lastSave', _.cloneDeep(instance));
       });
+      klass.after('find', function (instance) {
+        privateVariable(instance, 'lastSave', _.cloneDeep(instance));
+      });
+      klass.after('where', function (instances) {
+        instances.each(function (instance) {
+          privateVariable(instance, 'lastSave', _.cloneDeep(instance));
+        });
+      });
     };
     function Dirty() {
       privateVariable(this, 'dirty', function (options) {
@@ -980,7 +988,7 @@ angular.module('ngActiveResource').factory('ARDirty', [
           currentAttributes = dropAssociations(currentAttributes, reflections);
         }
         return _.chain(currentAttributes).keys().map(function (attributeName) {
-          if (attributeChanged(attributeName, currentAttributes, lastSave)) {
+          if (attributeChanged(attributeName, currentAttributes, lastSave) && attributeName != '$$hashKey') {
             return attributeName;
           }
         }, this).compact().value();
